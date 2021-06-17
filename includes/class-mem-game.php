@@ -1,0 +1,37 @@
+<?php
+
+namespace MemGame;
+
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
+class MemGame {
+
+  /* **********
+   * Properties
+   * **********/
+  
+  /* *******
+   * Methods
+   * *******/
+
+  // Constructor
+  public function __construct() {
+    mem_debug( 'MemGame constructor' );
+  }
+
+  // Run the plugin -- FIXME: Probably not needed
+  public function run() {
+    mem_debug( 'MemGame run()' );
+  }
+
+  // Activation
+  public function mem_game_activation() {
+    mem_debug( 'MemGame activate!' );
+  }
+
+  // Deactivation
+  public function mem_game_deactivation() {
+    mem_debug( 'MemGame deactivate!' );
+  }
+
+}
