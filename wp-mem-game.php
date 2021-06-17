@@ -43,7 +43,7 @@ if ( !class_exists( "MemGame" ) ) {
 	 * Instantiates the MemGame class and then calls its run method officially starting
 	 * the plugin.
 	 */
-  $mem_game = new HRHS_Plugin();
+  $mem_game = new MemGame();
   register_activation_hook(__FILE__, array($mem_game, 'mem_game_activation'));
   register_deactivation_hook(__FILE__, array($mem_game, 'mem_game_deactivation'));
   $mem_game->run();
