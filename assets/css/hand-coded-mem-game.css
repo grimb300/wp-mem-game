@@ -1,0 +1,61 @@
+.wrap,
+.wrap * {
+  box-sizing: border-box;
+}
+
+.wrap {
+  background: lightgray;
+  height: 100%;
+  min-height: 500px;
+}
+
+.card {
+  float: left;
+  width: 16.66666%;
+  height: 25%;
+  padding: 5px;
+  z-index: 50;
+}
+
+.card .inside {
+  width: 100%;
+  height: 100%;
+  display: block;
+  transform-style: preserve-3d;
+  background: white;
+}
+
+.card .inside.picked,
+.card .inside.matched {
+  transform: rotateY(180deg);
+}
+
+.card .front,
+.card .back {
+  border: 1px solid black;
+  backface-visibility: hidden;
+  /* position: relative;
+  top: 0;
+  bottom: 0; */
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+}
+
+.card .front {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.card .front img,
+.card .back img {
+  max-width: 100%;
+  display: block;
+  max-height: 100%;
+  margin: 0 auto;
+}
+
+.card .front {
+  transform: rotateY(-180deg);
+}

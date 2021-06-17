@@ -1,26 +1,21 @@
-* {
+.wrap,
+.wrap * {
   box-sizing: border-box;
 }
 
-html,
-body {
+.wrap {
   height: 100%;
-}
-
-body {
-  background: black;
+  background: lightgray;
   min-height: 100%;
-  font-family: "Arial", sans-serif;
 }
 
 .wrap {
-  position: relative;
   height: 100%;
   min-height: 500px;
-  padding-bottom: 20px;
 }
 
 .game {
+  display: flow-root;
   transform-style: preserve-3d;
   perspective: 500px;
   min-height: 100%;
@@ -46,7 +41,6 @@ body {
   position: relative;
   cursor: pointer;
   z-index: 50;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 @media (max-width: 800px) {
   .card {
@@ -73,9 +67,6 @@ body {
 .card .back {
   border: 1px solid black;
   backface-visibility: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   padding: 20px;
@@ -89,6 +80,9 @@ body {
 }
 .card .front {
   transform: rotateY(-180deg);
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 @media (max-width: 800px) {
   .card .front {
@@ -131,7 +125,6 @@ body {
 .modal .winner {
   font-size: 80px;
   text-align: center;
-  font-family: "Anton", sans-serif;
   color: #4d4d4d;
   text-shadow: 0px 3px 0 black;
 }
@@ -141,7 +134,6 @@ body {
   }
 }
 .modal .restart {
-  font-family: "Anton", sans-serif;
   margin: 30px auto;
   padding: 20px 30px;
   display: block;
@@ -214,21 +206,22 @@ body {
   background: #73b4ff;
 }
 
-footer {
+.mem-game-footer {
+  display: none;
   height: 20px;
   position: absolute;
   bottom: 0;
   width: 100%;
   z-index: 0;
 }
-footer .disclaimer {
+.mem-game-footer .disclaimer {
   line-height: 20px;
   font-size: 12px;
   color: #727272;
   text-align: center;
 }
 @media (max-width: 767px) {
-  footer .disclaimer {
+  .mem-game-footer .disclaimer {
     font-size: 8px;
   }
 }
