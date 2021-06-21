@@ -47,9 +47,9 @@ class MemShortcode {
   public function memgame_scripts() {
     global $post;
     if ( is_page() || is_single() ) {
-      mem_debug( sprintf( 'MemShortcode: This is a single %s', is_page() ? 'page' : 'post' ) );
+      // mem_debug( sprintf( 'MemShortcode: This is a single %s', is_page() ? 'page' : 'post' ) );
       if ( has_shortcode( $post->post_content, 'memgame' ) ) {
-        mem_debug( 'MemShortcode: It has the shortcode' );
+        // mem_debug( 'MemShortcode: It has the shortcode' );
 
         // Path to JS and CSS files
         $mem_game_js_path = MEM_GAME_PATH . 'assets/js/mem-game.js';
@@ -70,7 +70,7 @@ class MemShortcode {
         wp_enqueue_style( 'mem_game_css', $mem_game_css_url, array(), $mem_game_css_ver );
         // wp_enqueue_style( 'hand_coded_css', $hand_coded_css_url, array(), $hand_coded_css_ver );
       } else {
-        mem_debug( 'MemShortcode: It DOES NOT have the shortcode' );
+        // mem_debug( 'MemShortcode: It DOES NOT have the shortcode' );
       }
     }
   }

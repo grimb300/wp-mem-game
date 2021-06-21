@@ -42,6 +42,7 @@ class MemGame {
     //       If I want this accessible by non-admin roles, I might have to update
     //       the permissions via the 'option_page_capability_{$option_group}' hook
     add_action( 'admin_menu', 'MemGame\MemSettings::init' );
+    add_action( 'admin_enqueue_scripts', 'MemGame\MemSettings::enqueue_scripts' );
   }
 
   private function create_shortcode() {

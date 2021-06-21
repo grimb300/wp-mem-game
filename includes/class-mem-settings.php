@@ -50,7 +50,7 @@ class MemSettings {
     // Card back image
     add_settings_field(
       'back_image', // ID tag of the field
-      'Card Back', // Field title
+      'Card Back Image', // Field title
       array(                   // Callback for the field input
         'MemGame\MemSettings',
         'display_image_input'
@@ -81,6 +81,23 @@ class MemSettings {
 
   }
 
+  // If this is the settings page, enqueue the media picker scripts
+  public static function enqueue_scripts( $hook_suffix ) {
+    if ( 'toplevel_page_mem_game_settings' === $hook_suffix ) {
+      // Make sure the WP media scripts and styles are loaded
+      wp_enqueue_media();
+      // Get the path to JS and CSS files
+      $mem_media_picker_js_path = MEM_GAME_PATH . 'assets/js/mem-media-picker.js';
+      $mem_media_picker_js_url = MEM_GAME_URL . 'assets/js/mem-media-picker.js';
+      // Create the version based on the file modification time
+      $mem_media_picker_js_ver = date( 'ymd-Gis', fileatime( $mem_media_picker_js_path ) );
+      // Enqueue the files
+      // The borrowed JS needs jQuery
+      wp_enqueue_script( 'mem_media_picker_js', $mem_media_picker_js_url, array( 'jquery' ), $mem_media_picker_js_ver, true );
+      
+    }
+  }
+
   // Display the settings page card images section description
   public static function display_card_images_description( $args ) {
     ?>
@@ -100,15 +117,37 @@ class MemSettings {
 
     // Get the current value
     $image_options = get_option( 'mem_game_images' );
-    $option_value = $image_options[ $option_name ];
+    $option_img_id = is_array( $image_options ) && array_key_exists( $option_name, $image_options ) ? $image_options[ $option_name ] : -1;
 
-    // Display the media picker
+    /***************************************************
+     * Display the media picker
+     * Based loosely on the WordPress Codex (link above)
+     ***************************************************/
+
+    // Get WordPress' media upload URL
+    $upload_link = esc_url( get_upload_iframe_src( 'image' ) );
+
+    // Get the image src
+    $img_src = wp_get_attachment_image_src( $option_img_id, 'full' );
+
+    // For convenience, see if the array is valid
+    $valid_img = is_array( $img_src );
+
     ?>
-    <div class="preview_image_wrapper">
-      <img id="preview_image_<?php echo $option_name; ?>" src="" alt="Card Image" width="100" height="100" style="max-height: 100px; width: 100px;">
+    <div id="mem_game_card_image">
+      <div class="custom-img-container<?php echo $valid_img ? '' : ' hidden'; ?>">
+        <img src="<?php echo ( $valid_img ) ? $img_src[0] : ''; ?>" alt="Card Image" width="100" height="100" style="max-height: 100px; width: 100px;">
+      </div>
+      <p class="hide-if-no-js">
+        <a class="button upload-custom-img<?php echo $valid_img ? ' hidden' : ''; ?>" href="<?php echo $upload_link ?>">
+          <?php _e('Set custom image') ?>
+        </a>
+        <a class="button delete-custom-img<?php echo $valid_img ? '' : ' hidden'; ?>" href="#">
+          <?php _e('Remove this image') ?>
+        </a>
+      </p>
+      <input class="custom-img-id" name="mem_game_images[back_image]" type="hidden" value="<?php echo esc_attr( $option_img_id ); ?>" />
     </div>
-    <input id="upload_image_<?php echo $option_name; ?>" type="button" class="button" value="Upload Image">
-    <input type="hidden" name="mem_game_images[<?php echo $option_name ?>]" id="image_id_<?php echo $option_name ?>" value="">
     <?php
   }
 

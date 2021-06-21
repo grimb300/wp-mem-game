@@ -1,54 +1,71 @@
-jQuery( document ).ready( function( $ ) {
+jQuery(function ($) {
+  console.log("Running my code!");
+  // Set all variables to be used in scope
+  var frame,
+    metaBox = $("#mem_game_card_image"),
+    addImgLink = metaBox.find(".upload-custom-img"),
+    delImgLink = metaBox.find(".delete-custom-img"),
+    imgContainer = metaBox.find(".custom-img-container"),
+    imgElement = imgContainer.find("img"),
+    imgIdInput = metaBox.find(".custom-img-id");
 
-  // Uploading files
-  var file_frame;
-  var wp_media_post_id = wp.media.model.settings.post.id; // Store the old id
-  var set_to_post_id = <?php echo $my_saved_attachment_post_id; ?>; // Set this
-
-  jQuery('#upload_image_button').on('click', function( event ){
-
+  // ADD IMAGE LINK
+  addImgLink.on("click", function (event) {
+    console.log("Saw click event");
     event.preventDefault();
 
     // If the media frame already exists, reopen it.
-    if ( file_frame ) {
-      // Set the post ID to what we want
-      file_frame.uploader.uploader.param( 'post_id', set_to_post_id );
-      // Open frame
-      file_frame.open();
+    if (frame) {
+      frame.open();
       return;
-    } else {
-      // Set the wp.media post id so the uploader grabs the ID we want when initialised
-      wp.media.model.settings.post.id = set_to_post_id;
     }
 
-    // Create the media frame.
-    file_frame = wp.media.frames.file_frame = wp.media({
-      title: 'Select a image to upload',
+    // Create a new media frame
+    frame = wp.media({
+      title: "Select or Upload Media Of Your Chosen Persuasion",
       button: {
-        text: 'Use this image',
+        text: "Use this media",
       },
-      multiple: false	// Set to true to allow multiple files to be selected
+      multiple: false, // Set to true to allow multiple files to be selected
     });
 
-    // When an image is selected, run a callback.
-    file_frame.on( 'select', function() {
-      // We set multiple to false so only get one image from the uploader
-      attachment = file_frame.state().get('selection').first().toJSON();
+    // When an image is selected in the media frame...
+    frame.on("select", function () {
+      // Get media attachment details from the frame state
+      var attachment = frame.state().get("selection").first().toJSON();
 
-      // Do something with attachment.id and/or attachment.url here
-      $( '#image-preview' ).attr( 'src', attachment.url ).css( 'width', 'auto' );
-      $( '#image_attachment_id' ).val( attachment.id );
+      // Send the attachment URL to our image src attribute and unhide the image container.
+      imgElement.attr("src", attachment.url);
+      imgContainer.removeClass("hidden");
 
-      // Restore the main post ID
-      wp.media.model.settings.post.id = wp_media_post_id;
+      // Send the attachment id to our hidden input
+      imgIdInput.val(attachment.id);
+
+      // Hide the add image link
+      addImgLink.addClass("hidden");
+
+      // Unhide the remove image link
+      delImgLink.removeClass("hidden");
     });
 
-      // Finally, open the modal
-      file_frame.open();
+    // Finally, open the modal on click
+    frame.open();
   });
 
-  // Restore the main ID when the add media button is pressed
-  jQuery( 'a.add_media' ).on( 'click', function() {
-    wp.media.model.settings.post.id = wp_media_post_id;
+  // DELETE IMAGE LINK
+  delImgLink.on("click", function (event) {
+    event.preventDefault();
+
+    // Hide the preview image
+    imgContainer.addClass("hidden");
+
+    // Un-hide the add image link
+    addImgLink.removeClass("hidden");
+
+    // Hide the delete image link
+    delImgLink.addClass("hidden");
+
+    // Delete the image id from the hidden input
+    imgIdInput.val("");
   });
 });
