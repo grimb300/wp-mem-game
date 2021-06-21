@@ -69,6 +69,19 @@ class MemShortcode {
         wp_enqueue_script( 'mem_game_js', $mem_game_js_url, array( 'jquery' ), $mem_game_js_ver, true );
         wp_enqueue_style( 'mem_game_css', $mem_game_css_url, array(), $mem_game_css_ver );
         // wp_enqueue_style( 'hand_coded_css', $hand_coded_css_url, array(), $hand_coded_css_ver );
+
+        // Pass image info to the JS as localized data
+        $image_ids = MemSettings::get_image_ids();
+        $image_urls = MemSettings::get_image_urls();
+        mem_debug( 'Image IDs' );
+        mem_debug( $image_ids );
+        mem_debug( 'Image URLs' );
+        mem_debug( $image_urls );
+        wp_localize_script(
+          'mem_game_js',
+          'mem_game_img_obj',
+          $image_urls
+        );
       } else {
         // mem_debug( 'MemShortcode: It DOES NOT have the shortcode' );
       }

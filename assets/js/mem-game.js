@@ -123,7 +123,22 @@
 
     buildHTML: function () {
       var frag = "";
+      const card_back_url = mem_game_img_obj["card_back"];
+      console.log(`The card back image url is ${card_back_url}`);
       this.$cards.each(function (k, v) {
+        // frag +=
+        //   '<div class="card" data-id="' +
+        //   v.id +
+        //   '"><div class="inside">\
+        // <div class="front"><img src="' +
+        //   v.img +
+        //   '"\
+        // alt="' +
+        //   v.name +
+        //   '" /></div>\
+        // <div class="back"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/codepen-logo.png"\
+        // alt="Codepen" /></div></div>\
+        // </div>';
         frag +=
           '<div class="card" data-id="' +
           v.id +
@@ -134,7 +149,9 @@
 				alt="' +
           v.name +
           '" /></div>\
-				<div class="back"><img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/codepen-logo.png"\
+				<div class="back"><img src="' +
+          card_back_url +
+          '"\
 				alt="Codepen" /></div></div>\
 				</div>';
       });

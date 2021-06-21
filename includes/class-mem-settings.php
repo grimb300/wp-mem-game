@@ -17,7 +17,7 @@ class MemSettings {
    * *******/
 
   public static function init() {
-    mem_debug( 'MemSettings init called' );
+    // mem_debug( 'MemSettings init called' );
 
     // Register the memory game settings
     register_setting(
@@ -49,7 +49,7 @@ class MemSettings {
 
     // Card back image
     add_settings_field(
-      'back_image', // ID tag of the field
+      'card_back', // ID tag of the field
       'Card Back Image', // Field title
       array(                   // Callback for the field input
         'MemGame\MemSettings',
@@ -58,7 +58,7 @@ class MemSettings {
       'mem_game_settings',     // ID of the page to show the field
       'mem_game_card_images',  // ID of the section to show the field
       array(                   // Args passed to the callback
-        'label_for' => 'back_image',
+        'label_for' => 'card_back',
         'class' => 'mem_game_settings_row',
       )
     );
@@ -116,8 +116,10 @@ class MemSettings {
     $option_name = $args[ 'label_for' ];
 
     // Get the current value
-    $image_options = get_option( 'mem_game_images' );
-    $option_img_id = is_array( $image_options ) && array_key_exists( $option_name, $image_options ) ? $image_options[ $option_name ] : -1;
+    $image_ids = self::get_image_ids();
+    mem_debug( 'Images using self::get_image_ids()' );
+    mem_debug( $image_ids );
+    $this_image_id = is_array( $image_ids ) && array_key_exists( $option_name, $image_ids ) ? $image_ids[ $option_name ] : -1;
 
     /***************************************************
      * Display the media picker
@@ -128,22 +130,22 @@ class MemSettings {
     $upload_link = esc_url( get_upload_iframe_src( 'image' ) );
 
     // Get the image src
-    $img_src = wp_get_attachment_image_src( $option_img_id, 'full' );
+    $image_src = wp_get_attachment_image_src( $this_image_id, 'full' );
 
     // For convenience, see if the array is valid
-    $valid_img = is_array( $img_src );
+    $valid_image = is_array( $image_src );
 
     ?>
     <div id="mem_game_card_image" style="display: flex; align-items: center;">
-      <div class="custom-img-container<?php echo $valid_img ? '' : ' hidden'; ?>">
-        <img src="<?php echo $valid_img ? $img_src[0] : ''; ?>" alt="Card Image" width="100" height="100" style="max-height: 100px; width: 100px;">
+      <div class="custom-img-container<?php echo $valid_image ? '' : ' hidden'; ?>">
+        <image src="<?php echo $valid_image ? $image_src[0] : ''; ?>" alt="Card Image" width="100" height="100" style="max-height: 100px; width: 100px;">
       </div>
       <p class="hide-if-no-js">
         <a class="button upload-custom-img" href="<?php echo $upload_link ?>" style="margin-left: 1em;">
-          <?php $valid_img ? _e('Update') : _e('Add') ?>
+          <?php $valid_image ? _e('Update') : _e('Add') ?>
         </a>
       </p>
-      <input class="custom-img-id" name="mem_game_images[back_image]" type="hidden" value="<?php echo esc_attr( $option_img_id ); ?>" />
+      <input class="custom-img-id" name="mem_game_images[card_back]" type="hidden" value="<?php echo esc_attr( $this_image_id ); ?>" />
     </div>
     <?php
   }
@@ -172,6 +174,45 @@ class MemSettings {
       ?>
     </form>
     <?php
+  }
+
+  // Retrieve the image IDs
+  public static function get_image_ids() {
+    mem_debug( 'get_image_ids called, will return' );
+    mem_debug( get_option( 'mem_game_images' ) );
+    return get_option( 'mem_game_images' );
+  }
+
+  // Retrieve the image source URLs
+  // This will return an associative array of ( image_type => image_url ) and will return a default image_url for missing images
+  public static function get_image_urls() {
+    // Image types
+    // TODO: This should be a class property
+    $image_types = array( 'card_back' );
+    // Get the IDs
+    $image_ids = self::get_image_ids();
+    // Convert the IDs into URLs, using a default value if no ID is present
+    $image_urls = array_map(
+      function ( $image_type ) use ( $image_ids ) {
+        // If $image_ids contains this image type...
+        if ( array_key_exists( $image_type, $image_ids ) ) {
+          // Get the image source
+          $image_src = wp_get_attachment_image_src( $image_ids[ $image_type ], 'full' );
+          // If a valid image is found, return the URL
+          if ( is_array( $image_src ) ) {
+            return $image_src[0];
+          }
+        }
+
+        // If we make it this far, the image doesn't exist, return a default image
+        mem_debug( 'Returning a default image' );
+        // FIXME: Make the default images a class property
+        return "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/codepen-logo.png";
+      },
+      $image_types
+    );
+    // Return combined array (image_type => image_url)
+    return array_combine( $image_types, $image_urls );
   }
   
 }
