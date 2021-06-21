@@ -134,16 +134,13 @@ class MemSettings {
     $valid_img = is_array( $img_src );
 
     ?>
-    <div id="mem_game_card_image">
+    <div id="mem_game_card_image" style="display: flex; align-items: center;">
       <div class="custom-img-container<?php echo $valid_img ? '' : ' hidden'; ?>">
-        <img src="<?php echo ( $valid_img ) ? $img_src[0] : ''; ?>" alt="Card Image" width="100" height="100" style="max-height: 100px; width: 100px;">
+        <img src="<?php echo $valid_img ? $img_src[0] : ''; ?>" alt="Card Image" width="100" height="100" style="max-height: 100px; width: 100px;">
       </div>
       <p class="hide-if-no-js">
-        <a class="button upload-custom-img<?php echo $valid_img ? ' hidden' : ''; ?>" href="<?php echo $upload_link ?>">
-          <?php _e('Set custom image') ?>
-        </a>
-        <a class="button delete-custom-img<?php echo $valid_img ? '' : ' hidden'; ?>" href="#">
-          <?php _e('Remove this image') ?>
+        <a class="button upload-custom-img" href="<?php echo $upload_link ?>" style="margin-left: 1em;">
+          <?php $valid_img ? _e('Update') : _e('Add') ?>
         </a>
       </p>
       <input class="custom-img-id" name="mem_game_images[back_image]" type="hidden" value="<?php echo esc_attr( $option_img_id ); ?>" />

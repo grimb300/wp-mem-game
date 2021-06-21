@@ -4,7 +4,6 @@ jQuery(function ($) {
   var frame,
     metaBox = $("#mem_game_card_image"),
     addImgLink = metaBox.find(".upload-custom-img"),
-    delImgLink = metaBox.find(".delete-custom-img"),
     imgContainer = metaBox.find(".custom-img-container"),
     imgElement = imgContainer.find("img"),
     imgIdInput = metaBox.find(".custom-img-id");
@@ -42,30 +41,10 @@ jQuery(function ($) {
       imgIdInput.val(attachment.id);
 
       // Hide the add image link
-      addImgLink.addClass("hidden");
-
-      // Unhide the remove image link
-      delImgLink.removeClass("hidden");
+      addImgLink.text("Update");
     });
 
     // Finally, open the modal on click
     frame.open();
-  });
-
-  // DELETE IMAGE LINK
-  delImgLink.on("click", function (event) {
-    event.preventDefault();
-
-    // Hide the preview image
-    imgContainer.addClass("hidden");
-
-    // Un-hide the add image link
-    addImgLink.removeClass("hidden");
-
-    // Hide the delete image link
-    delImgLink.addClass("hidden");
-
-    // Delete the image id from the hidden input
-    imgIdInput.val("");
   });
 });
