@@ -137,8 +137,8 @@ class MemSettings {
 
     // Get the current value
     $image_ids = self::get_image_ids();
-    mem_debug( 'Images using self::get_image_ids()' );
-    mem_debug( $image_ids );
+    // mem_debug( 'Images using self::get_image_ids()' );
+    // mem_debug( $image_ids );
     $this_image_id = is_array( $image_ids ) && array_key_exists( $option_name, $image_ids ) ? $image_ids[ $option_name ] : -1;
 
     /***************************************************
@@ -198,8 +198,8 @@ class MemSettings {
 
   // Retrieve the image IDs
   public static function get_image_ids() {
-    mem_debug( 'get_image_ids called, will return' );
-    mem_debug( get_option( 'mem_game_images' ) );
+    // mem_debug( 'get_image_ids called, will return' );
+    // mem_debug( get_option( 'mem_game_images' ) );
     return get_option( 'mem_game_images' );
   }
 
@@ -225,7 +225,7 @@ class MemSettings {
         }
 
         // If we make it this far, the image doesn't exist, return a default image
-        mem_debug( 'Returning a default image' );
+        // mem_debug( 'Returning a default image' );
         // FIXME: Make the default images a class property
         return self::get_image_default_url( $image_type );
       },
@@ -248,7 +248,7 @@ class MemSettings {
 
   // Get the default URL for an image type
   private static function get_image_default_url( $image_type ) {
-    mem_debug( 'Getting default URL for ' . $image_type );
+    // mem_debug( 'Getting default URL for ' . $image_type );
     $filtered_images = array_filter( self::$images, function( $image ) use ( $image_type ) {
       return $image_type === $image[ 'type' ];
     } );

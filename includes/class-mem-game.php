@@ -23,6 +23,10 @@ class MemGame {
 
     // Create the shortcode
     $this->create_shortcode();
+
+    // Initialize the stats table
+    // FIXME: Eventually move this into the activate function
+    $this->init_stats();
   }
 
   // Run the plugin -- FIXME: Probably not needed
@@ -48,6 +52,11 @@ class MemGame {
   private function create_shortcode() {
     require_once MEM_GAME_PATH . 'includes/class-mem-shortcode.php';
     $mem_shortcode = new MemShortcode();
+  }
+
+  private function init_stats() {
+    require_once MEM_GAME_PATH . 'includes/class-mem-stats.php';
+    MemStats::init();
   }
 
   // Activation
