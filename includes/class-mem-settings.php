@@ -12,6 +12,22 @@ class MemSettings {
    * Properties
    * **********/
 
+  public static $images = array(
+    array( 'type' => 'card_back', 'title' => 'Card Back', 'default_url' => MEM_GAME_URL . 'assets/images/social-memory.png' ),
+    array( 'type' => 'card_front_0', 'title' => 'Card Front[0]', 'default_url' => MEM_GAME_URL . 'assets/images/dropbox-logo.png' ),
+    array( 'type' => 'card_front_1', 'title' => 'Card Front[1]', 'default_url' => MEM_GAME_URL . 'assets/images/facebook-logo.png' ),
+    array( 'type' => 'card_front_2', 'title' => 'Card Front[2]', 'default_url' => MEM_GAME_URL . 'assets/images/instagram-logo.png' ),
+    array( 'type' => 'card_front_3', 'title' => 'Card Front[3]', 'default_url' => MEM_GAME_URL . 'assets/images/linkedin-logo.png' ),
+    array( 'type' => 'card_front_4', 'title' => 'Card Front[4]', 'default_url' => MEM_GAME_URL . 'assets/images/pinterest-logo.png' ),
+    array( 'type' => 'card_front_5', 'title' => 'Card Front[5]', 'default_url' => MEM_GAME_URL . 'assets/images/skype-logo.png' ),
+    array( 'type' => 'card_front_6', 'title' => 'Card Front[6]', 'default_url' => MEM_GAME_URL . 'assets/images/snapchat-logo.png' ),
+    array( 'type' => 'card_front_7', 'title' => 'Card Front[7]', 'default_url' => MEM_GAME_URL . 'assets/images/spotify-logo.png' ),
+    array( 'type' => 'card_front_8', 'title' => 'Card Front[8]', 'default_url' => MEM_GAME_URL . 'assets/images/twitter-logo.png' ),
+    array( 'type' => 'card_front_9', 'title' => 'Card Front[9]', 'default_url' => MEM_GAME_URL . 'assets/images/vimeo-logo.png' ),
+    array( 'type' => 'card_front_10', 'title' => 'Card Front[10]', 'default_url' => MEM_GAME_URL . 'assets/images/whatsapp-logo.png' ),
+    array( 'type' => 'card_front_11', 'title' => 'Card Front[11]', 'default_url' => MEM_GAME_URL . 'assets/images/youtube-logo.png' ),
+  );
+
   /* *******
    * Methods
    * *******/
@@ -47,21 +63,25 @@ class MemSettings {
      * Settings fields
      * ***************/
 
+    // Iterate across all images in self::$images
+    foreach( self::$images as $info ) {
+      add_settings_field(
+        $info[ 'type' ], // ID tag of the field
+        $info[ 'title' ] . ' Image', // Field title
+        array(                   // Callback for the field input
+          'MemGame\MemSettings',
+          'display_image_input'
+        ),
+        'mem_game_settings',     // ID of the page to show the field
+        'mem_game_card_images',  // ID of the section to show the field
+        array(                   // Args passed to the callback
+          'label_for' => $info[ 'type' ],
+          'class' => 'mem_game_settings_row',
+        )
+      );
+    }
+
     // Card back image
-    add_settings_field(
-      'card_back', // ID tag of the field
-      'Card Back Image', // Field title
-      array(                   // Callback for the field input
-        'MemGame\MemSettings',
-        'display_image_input'
-      ),
-      'mem_game_settings',     // ID of the page to show the field
-      'mem_game_card_images',  // ID of the section to show the field
-      array(                   // Args passed to the callback
-        'label_for' => 'card_back',
-        'class' => 'mem_game_settings_row',
-      )
-    );
 
     /* *******************
      * END Settings fields
@@ -136,16 +156,16 @@ class MemSettings {
     $valid_image = is_array( $image_src );
 
     ?>
-    <div id="mem_game_card_image" style="display: flex; align-items: center;">
+    <div class="mem_game_card_image" id="mem_game_<?php echo $option_name; ?>_image" style="display: flex; align-items: center;">
       <div class="custom-img-container<?php echo $valid_image ? '' : ' hidden'; ?>">
-        <image src="<?php echo $valid_image ? $image_src[0] : ''; ?>" alt="Card Image" width="100" height="100" style="max-height: 100px; width: 100px;">
+        <image src="<?php echo $valid_image ? $image_src[0] : ''; ?>" alt="Card Image" style="max-height: 100px; max-width: 100px;">
       </div>
       <p class="hide-if-no-js">
         <a class="button upload-custom-img" href="<?php echo $upload_link ?>" style="margin-left: 1em;">
           <?php $valid_image ? _e('Update') : _e('Add') ?>
         </a>
       </p>
-      <input class="custom-img-id" name="mem_game_images[card_back]" type="hidden" value="<?php echo esc_attr( $this_image_id ); ?>" />
+      <input class="custom-img-id" name="mem_game_images[<?php echo $option_name ?>]" type="hidden" value="<?php echo esc_attr( $this_image_id ); ?>" />
     </div>
     <?php
   }
@@ -188,7 +208,7 @@ class MemSettings {
   public static function get_image_urls() {
     // Image types
     // TODO: This should be a class property
-    $image_types = array( 'card_back' );
+    $image_types = self::get_image_types();
     // Get the IDs
     $image_ids = self::get_image_ids();
     // Convert the IDs into URLs, using a default value if no ID is present
@@ -207,12 +227,36 @@ class MemSettings {
         // If we make it this far, the image doesn't exist, return a default image
         mem_debug( 'Returning a default image' );
         // FIXME: Make the default images a class property
-        return "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/codepen-logo.png";
+        return self::get_image_default_url( $image_type );
       },
       $image_types
     );
     // Return combined array (image_type => image_url)
     return array_combine( $image_types, $image_urls );
+  }
+
+  /**
+   * Accessor functions for the data contained in self::$images
+   */
+
+  // Get an array of image types
+  private static function get_image_types() {
+    return array_map( function ( $image ) {
+      return $image[ 'type' ];
+    }, self::$images );
+  }
+
+  // Get the default URL for an image type
+  private static function get_image_default_url( $image_type ) {
+    mem_debug( 'Getting default URL for ' . $image_type );
+    $filtered_images = array_filter( self::$images, function( $image ) use ( $image_type ) {
+      return $image_type === $image[ 'type' ];
+    } );
+    // Since array_filter preserves keys, compact the resulting array
+    $compacted_images = array_values( $filtered_images );
+    // Assume that there is only one match
+    $this_image = $compacted_images[0];
+    return $this_image[ 'default_url' ];
   }
   
 }
