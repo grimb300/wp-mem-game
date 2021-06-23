@@ -20,6 +20,7 @@
   // Stats related stuff
   let collectingStats = false;
   let collectedClicks = 0;
+  let currentSessionID = -1;
 
   // Called on every card click
   const handleCardClick = () => {
@@ -34,14 +35,16 @@
         data: {
           action: "mem_game_start",
           _ajax_nonce: mem_game_img_obj.nonce,
+          data: { session_id: currentSessionID },
         },
         success: function (response) {
           console.log("The response:");
           console.log(response);
           if (response.success) {
             console.log(
-              `Action mem_game_start was successful: ${response.data.message}`
+              `Action mem_game_start was successful! Session Id ${response.data.session_id}`
             );
+            currentSessionID = response.data.session_id;
           } else {
             console.log("Action mem_game_start had some problems");
           }
@@ -68,6 +71,7 @@
         action: "mem_game_complete",
         _ajax_nonce: mem_game_img_obj.nonce,
         data: {
+          session_id: currentSessionID,
           num_clicks: collectedClicks,
         },
       },
@@ -76,7 +80,7 @@
         console.log(response);
         if (response.success) {
           console.log(
-            `Action mem_game_complete was successful: ${response.data.message}`
+            `Action mem_game_complete was successful! Session Id ${currentSessionID}`
           );
         } else {
           console.log("Action mem_game_complete had some problems");
@@ -106,6 +110,7 @@
         action: "mem_game_abandon",
         _ajax_nonce: mem_game_img_obj.nonce,
         data: {
+          session_id: currentSessionID,
           num_clicks: collectedClicks,
         },
       },
@@ -114,7 +119,7 @@
         console.log(response);
         if (response.success) {
           console.log(
-            `Action mem_game_complete was successful: ${response.data.message}`
+            `Action mem_game_complete was successful! Session Id ${currentSessionID}`
           );
         } else {
           console.log("Action mem_game_complete had some problems");
