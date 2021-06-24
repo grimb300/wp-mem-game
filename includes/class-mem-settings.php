@@ -96,7 +96,7 @@ class MemSettings {
       'mem_game_settings',                          // Menu slug
       'MemGame\MemSettings::display_settings_page', // Display callback
       'dashicons-forms',                            // Icon
-      1                                             // Position (putting it at the top for now)
+      30                                             // Position (30 puts it after the "Comments" menu item)
     );
 
   }

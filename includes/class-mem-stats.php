@@ -411,6 +411,7 @@ class MemStats {
     $avg_clicks_per_never_completed = $totals[ 'never_completed_clicks' ] / $totals[ 'never_completed' ];
 
     // Display the stats
+    // TODO: Add raw data display? Add reset stats button?
     ?>
     <style>
     .mem-game-stats > p {
