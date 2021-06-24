@@ -279,4 +279,150 @@ class MemStats {
     }
     return $unpacked_array;
   }
+
+  // Analyze the stats
+  // This is echoed out, currently only used in MemStats
+  public static function get_analyzed_stats() {
+    global $wpdb;
+    $full_table_name = $wpdb->prefix . self::$table_name;
+    $sessions = $wpdb->get_results( "SELECT * FROM `$full_table_name`;", ARRAY_A );
+    $analyzed_sessions = array_map( function( $session ) {
+      $game_data = self::unpack_game_data( $session[ 'game_data' ] );
+      return array_reduce(
+        $game_data,
+        function( $t, $g ) {
+          $type = 'none';
+          if ( $g[ 'completed' ] ) {
+            $type = 'completed';
+          }
+          if ( $g[ 'abandoned' ] ) {
+            $type = 'abandoned';
+          }
+          if ( 'none' !== $type ) {
+            // Increment number of games by 1
+            $t[ $type ][ 'games' ] += 1;
+            // Calculate the number of seconds and increment
+            $game_secs = $g[ 'end' ] - $g[ 'start' ];
+            $t[ $type ][ 'total_seconds' ] += $game_secs;
+            // Update the max number of seconds
+            if ( empty( $t[ $type ][ 'max_seconds' ] ) || $game_secs > $t[ $type ][ 'max_seconds' ] ) {
+              $t[ $type ][ 'max_seconds' ] = $game_secs;
+            }
+            // Update the min number of seconds
+            if ( empty( $t[ $type ][ 'min_seconds' ] ) || $game_secs < $t[ $type ][ 'min_seconds' ] ) {
+              $t[ $type ][ 'min_seconds' ] = $game_secs;
+            }
+            // Increment the total number of clicks
+            $t[ $type ][ 'total_clicks' ] += $g[ 'clicks' ];
+            // Update the max number of clicks
+            if ( empty( $t[ $type ][ 'max_clicks' ] ) || $g[ 'clicks' ] > $t[ $type ][ 'max_clicks' ] ) {
+              $t[ $type ][ 'max_clicks' ] = $g[ 'clicks' ];
+            }
+            // Update the min number of clicks
+            if ( empty( $t[ $type ][ 'min_clicks' ] ) || $g[ 'clicks' ] < $t[ $type ][ 'min_clicks' ] ) {
+              $t[ $type ][ 'min_clicks' ] = $g[ 'clicks' ];
+            }
+          }
+          // Return the total
+          return $t;
+        },
+        array(
+          'completed' => array(
+            'games' => 0,
+            'total_seconds' => 0,
+            'max_seconds' => 0,
+            'min_seconds' => 0,
+            'total_clicks' => 0,
+            'max_clicks' => 0,
+            'min_clicks' => 0,
+          ),
+          'abandoned' => array(
+            'games' => 0,
+            'total_seconds' => 0,
+            'max_seconds' => 0,
+            'min_seconds' => 0,
+            'total_clicks' => 0,
+            'max_clicks' => 0,
+            'min_clicks' => 0,
+          )
+        )
+      );
+    }, $sessions );
+
+    mem_debug( 'Analyzed sessions' );
+    mem_debug( $analyzed_sessions );
+
+    $totals = array_reduce(
+      $analyzed_sessions,
+      function( $t, $s ) {
+        // Increment the total completed and abandoned games
+        $t[ 'games' ] += $s[ 'completed' ][ 'games' ] + $s[ 'abandoned' ][ 'games' ];
+        $t[ 'completed' ] += $s[ 'completed' ][ 'games' ];
+        $t[ 'abandoned' ] += $s[ 'abandoned' ][ 'games' ];
+        
+        // Increment the clicks for each game type
+        $t[ 'clicks' ] += $s[ 'completed' ][ 'total_clicks' ] + $s[ 'abandoned' ][ 'total_clicks' ];
+        $t[ 'completed_clicks' ] += $s[ 'completed' ][ 'total_clicks' ];
+        $t[ 'abandoned_clicks' ] += $s[ 'abandoned' ][ 'total_clicks' ];
+        
+        // Increment the seconds for each game type
+        $t[ 'seconds' ] += $s[ 'completed' ][ 'total_seconds' ] + $s[ 'abandoned' ][ 'total_seconds' ];
+        $t[ 'completed_seconds' ] += $s[ 'completed' ][ 'total_seconds' ];
+        $t[ 'abandoned_seconds' ] += $s[ 'abandoned' ][ 'total_seconds' ];
+
+        // Update the max complete games per session
+        if ( $s[ 'completed' ][ 'games' ] > $t[ 'max_completed' ] ) {
+          $t[ 'max_completed' ] = $s[ 'completed' ][ 'games' ];
+        }
+
+        // If a session never completed a game, increment the counters
+        if ( 0 === $s[ 'completed' ][ 'games' ] ) {
+          mem_debug( 'Never completed' );
+          $t[ 'never_completed' ] += 1;
+          $t[ 'never_completed_clicks' ] += $s[ 'abandoned' ][ 'total_clicks' ];
+          $t[ 'never_completed_seconds' ] += $s[ 'abandoned' ][ 'total_seconds' ];
+        }
+
+        // Return the running total
+        return $t;
+      },
+      array(
+        'games' => 0,
+        'completed' => 0,
+        'abandoned' => 0,
+        'never_completed' => 0,
+        'max_completed' => 0,
+        'clicks' => 0,
+        'completed_clicks' => 0,
+        'abandoned_clicks' => 0,
+        'never_completed_clicks' => 0,
+        'seconds' => 0,
+        'completed_seconds' => 0,
+        'abandoned_seconds' => 0,
+        'never_completed_seconds' => 0,
+      )
+    );
+
+    $num_sessions = sizeof( $sessions );
+    $avg_completed_per_session = $totals[ 'completed' ] / $num_sessions;
+    $avg_seconds_per_session = $totals[ 'seconds' ] / $num_sessions;
+    $avg_clicks_per_session = $totals[ 'clicks' ] / $num_sessions;
+    $avg_seconds_per_never_completed = $totals[ 'never_completed_seconds' ] / $totals[ 'never_completed' ];
+    $avg_clicks_per_never_completed = $totals[ 'never_completed_clicks' ] / $totals[ 'never_completed' ];
+
+    // Display the stats
+    ?>
+    <style>
+    .mem-game-stats > p {
+      font-size: 16px;
+    }
+    </style>
+    <div class="mem-game-stats">
+      <p>Analyzed <strong><?php echo $num_sessions; ?></strong> unique sessions and <strong><?php echo $totals[ 'games' ]; ?></strong> games (<strong><?php echo $totals[ 'completed' ]; ?></strong> completed and <strong><?php echo $totals[ 'abandoned' ]; ?></strong> abandoned).</p>
+      <p>Each session averaged <strong><?php echo sprintf( '%.1f', $avg_completed_per_session ); ?></strong> completed games with <strong><?php echo $totals[ 'max_completed' ]; ?></strong> games being the most completed in one session.</p>
+      <p>A session lasted on average for <strong><?php echo sprintf( '%.1f', $avg_seconds_per_session ); ?></strong> seconds (<strong><?php echo sprintf( '%.1f', $avg_clicks_per_session ); ?></strong> clicks).</p>
+      <p><strong><?php echo $totals[ 'never_completed' ]; ?></strong> sessions never completed a single game and lasted on average for <strong><?php echo sprintf( '%.1f', $avg_seconds_per_never_completed ); ?></strong> seconds (<strong><?php echo sprintf( '%.1f', $avg_clicks_per_never_completed ); ?></strong> clicks).</p>
+    </div>
+    <?php
+  }
 }

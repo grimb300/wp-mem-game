@@ -179,7 +179,7 @@ class MemSettings {
 
     // Display the page
     ?>
-    <h1>Manage Memory Game Settings!!!!!</h1>
+    <h1>Memory Game Settings</h1>
     <form action="options.php" method="post">
       <?php
       // Output nonce, action, and option_page fields
@@ -193,6 +193,8 @@ class MemSettings {
       submit_button( 'Save Settings' );
       ?>
     </form>
+    <h1>Memory Game Statistics</h1>
+    <?php $stats = MemStats::get_analyzed_stats(); ?>
     <?php
   }
 
