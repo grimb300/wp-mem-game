@@ -31,10 +31,12 @@ class MemShortcode {
     $game = <<<END
     <div class="wrap">
       <div class="game"></div>
-      <div class="modal-overlay">
-        <div class="modal">
-          <h2 class="winner">You Rock!</h2>
-          <button class="restart">Play Again?</button>
+      <div class="modal-wrap">
+        <div class="modal-overlay">
+          <div class="modal">
+            <h2 class="winner">You Rock!</h2>
+            <button class="restart">Play Again?</button>
+          </div>
         </div>
       </div>
     </div><!-- End Wrap -->
@@ -56,19 +58,15 @@ class MemShortcode {
         $mem_game_js_url = MEM_GAME_URL . 'assets/js/mem-game.js';
         $mem_game_css_path = MEM_GAME_PATH . 'assets/css/mem-game.css';
         $mem_game_css_url = MEM_GAME_URL . 'assets/css/mem-game.css';
-        $hand_coded_css_path = MEM_GAME_PATH . 'assets/css/hand-coded-mem-game.css';
-        $hand_coded_css_url = MEM_GAME_URL . 'assets/css/hand-coded-mem-game.css';
 
         // Create the version based on the file modification time
         $mem_game_js_ver = date( 'ymd-Gis', fileatime( $mem_game_js_path ) );
         $mem_game_css_ver = date( 'ymd-Gis', fileatime( $mem_game_css_path ) );
-        $hand_coded_css_ver = date( 'ymd-Gis', fileatime( $mem_game_css_path ) );
 
         // Enqueue the files
         // The borrowed JS needs jQuery (the CodePen used ver 2.1.3, assuming the default WP ver will do)
         wp_enqueue_script( 'mem_game_js', $mem_game_js_url, array( 'jquery' ), $mem_game_js_ver, true );
         wp_enqueue_style( 'mem_game_css', $mem_game_css_url, array(), $mem_game_css_ver );
-        // wp_enqueue_style( 'hand_coded_css', $hand_coded_css_url, array(), $hand_coded_css_ver );
 
         // Pass image info to the JS as localized data
         $image_ids = MemSettings::get_image_ids();

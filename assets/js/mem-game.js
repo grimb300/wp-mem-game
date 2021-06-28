@@ -60,9 +60,9 @@
   const handleWin = () => {
     // Stop collecting stats and send game completion AJAX message
     collectingStats = false;
-    console.log(
-      `Winner, winner, chicken dinner! Only took ${collectedClicks} clicks!`
-    );
+    // console.log(
+    //   `Winner, winner, chicken dinner! Only took ${collectedClicks} clicks!`
+    // );
     jQuery.ajax({
       type: "post",
       dataType: "json",
@@ -136,7 +136,8 @@
     init: function (cards) {
       this.$game = $(".game");
       this.$modal = $(".modal");
-      this.$overlay = $(".modal-overlay");
+      // this.$overlay = $(".modal-overlay");
+      this.$overlay = $(".modal-wrap");
       this.$restartButton = $("button.restart");
       this.cardsArray = $.merge(cards, cards);
       this.shuffleCards(this.cardsArray);
@@ -200,7 +201,7 @@
       this.paused = true;
       setTimeout(function () {
         Memory.showModal();
-        Memory.$game.fadeOut();
+        // Memory.$game.fadeOut();
       }, 1000);
     },
 
@@ -218,7 +219,7 @@
       this.hideModal();
       this.shuffleCards(this.cardsArray);
       this.setup();
-      this.$game.show("slow");
+      // this.$game.show("slow");
     },
 
     // Fisher--Yates Algorithm -- https://bost.ocks.org/mike/shuffle/
