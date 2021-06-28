@@ -158,7 +158,7 @@ class MemSettings {
     ?>
     <div class="mem_game_card_image" id="mem_game_<?php echo $option_name; ?>_image" style="display: flex; align-items: center;">
       <div class="custom-img-container<?php echo $valid_image ? '' : ' hidden'; ?>">
-        <image src="<?php echo $valid_image ? $image_src[0] : ''; ?>" alt="Card Image" style="max-height: 100px; max-width: 100px;">
+        <image id="img-<?php echo $option_name; ?>" src="<?php echo $valid_image ? $image_src[0] : ''; ?>" alt="Card Image" style="max-height: 100px; max-width: 100px;">
       </div>
       <p class="hide-if-no-js">
         <a class="button upload-custom-img" href="<?php echo $upload_link ?>" style="margin-left: 1em;">

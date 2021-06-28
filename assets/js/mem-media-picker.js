@@ -1,26 +1,22 @@
 jQuery(function ($) {
-  console.log("Running my code!");
-  // Set all variables to be used in scope
+  // Get a handle for each media picker
   // var frame,
-  //   metaBoxes = $(".mem_game_card_image"),
-  //   addImgLink = metaBox.find(".upload-custom-img"),
-  //   imgContainer = metaBox.find(".custom-img-container"),
-  //   imgElement = imgContainer.find("img"),
-  //   imgIdInput = metaBox.find(".custom-img-id");
-  var frame,
-    metaBoxes = $(".mem_game_card_image");
+  const mediaPickers = $(".mem_game_card_image");
 
-  console.log("metaBoxes");
-  console.log(metaBoxes);
-  metaBoxes.each(function (index) {
-    var addImgLink = $(this).find(".upload-custom-img"),
-      imgContainer = $(this).find(".custom-img-container"),
-      imgElement = imgContainer.find("img"),
-      imgIdInput = $(this).find(".custom-img-id");
+  // Iterate across all media pickers
+  mediaPickers.each(function (index) {
+    // Get a handle for the important elements inside each picker
+    const addImgLink = $(this).find(".upload-custom-img");
+    const imgContainer = $(this).find(".custom-img-container");
+    const imgElement = imgContainer.find("img");
+    const imgIdInput = $(this).find(".custom-img-id");
 
-    // ADD IMAGE LINK
+    // The media frame is scoped to this picker, don't create it yet
+    let frame;
+
+    // Handle add/update image clicks
     addImgLink.on("click", function (event) {
-      console.log("Saw click event");
+      // Prevent the default behavior
       event.preventDefault();
 
       // If the media frame already exists, reopen it.
