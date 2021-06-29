@@ -1,16 +1,16 @@
 @use "sass:math";
 
-.wrap,
-.wrap * {
+.mg-wrap,
+.mg-wrap * {
   box-sizing: border-box;
 }
 
-.wrap {
+.mg-wrap {
   // Using relative to display the modal over the top of the game
   position: relative;
 }
 
-.game {
+.mg-game {
   width: 100%;
   height: 100%;
   // Create the grid
@@ -28,7 +28,7 @@
   }
 }
 
-.inside {
+.mg-inside {
   // Using an aspect ratio trick found in CSS Tricks
   // https://css-tricks.com/aspect-ratio-boxes/
   padding-top: math.div(5, 4) * 100%; // 4x5 card aspect ratio
@@ -41,19 +41,19 @@
   transition: 0.4s ease-in-out;
   background: white;
 
-  &.picked,
-  &.matched {
+  &.mg-picked,
+  &.mg-matched {
     transform: rotateY(180deg);
   }
 
-  &.matched {
+  &.mg-matched {
     animation: 1s matchAnim ease-in-out;
     animation-delay: 0.4s;
   }
 }
 
-.front,
-.back {
+.mg-front,
+.mg-back {
   // Second half of the aspect ratio trick, position the front and back at absolute(0,0)
   position: absolute;
   top: 0;
@@ -76,15 +76,15 @@
   }
 }
 
-.front {
+.mg-front {
   transform: rotateY(-180deg);
 }
 
-.back {
+.mg-back {
   transform: rotateY(0);
 }
 
-.modal-wrap {
+.mg-modal-wrap {
   display: none;
   background: rgba(0, 0, 0, 0.8);
   position: absolute;
@@ -95,7 +95,7 @@
   height: 100%;
 }
 
-.modal-overlay {
+.mg-modal-overlay {
   width: 100%;
   height: 100%;
 
@@ -104,21 +104,21 @@
   align-items: center;
 }
 
-.modal {
+.mg-modal {
   display: none;
   width: 80%;
   margin: 0 auto;
   background: white;
   padding: 30px 10px;
 
-  .winner {
+  .mg-winner {
     font-size: 80px;
     text-align: center;
     color: #4d4d4d;
     text-shadow: 0px 3px 0 black;
   }
 
-  .restart {
+  .mg-restart {
     margin: 30px auto;
     padding: 20px 30px;
     display: block;

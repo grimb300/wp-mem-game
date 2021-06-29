@@ -29,13 +29,13 @@ class MemShortcode {
   // TODO: Eventually the configuration will be in $params
   public function memgame_display( $params ) {
     $game = <<<END
-    <div class="wrap">
-      <div class="game"></div>
-      <div class="modal-wrap">
-        <div class="modal-overlay">
-          <div class="modal">
-            <h2 class="winner">You Rock!</h2>
-            <button class="restart">Play Again?</button>
+    <div class="mg-wrap">
+      <div class="mg-game"></div>
+      <div class="mg-modal-wrap">
+        <div class="mg-modal-overlay">
+          <div class="mg-modal">
+            <h2 class="mg-winner">You Rock!</h2>
+            <button class="mg-restart">Play Again?</button>
           </div>
         </div>
       </div>
@@ -43,6 +43,21 @@ class MemShortcode {
     END;
 
     return $game;
+  }
+
+  // Enqueue CSS file
+  // Break this out into its own function so it can be easily shared with the admin pages
+  // FIXME: Doing a lot of repeating with how I enqueue JS and CSS files, make this its own helper function
+  public static function enqueue_memgame_css() {
+    // Path to the CSS file
+    $mem_game_css_path = MEM_GAME_PATH . 'assets/css/mem-game.css';
+    $mem_game_css_url = MEM_GAME_URL . 'assets/css/mem-game.css';
+
+    // Create the version based on the file modification time
+    $mem_game_css_ver = date( 'ymd-Gis', fileatime( $mem_game_css_path ) );
+
+    // Enqueue the files
+    wp_enqueue_style( 'mem_game_css', $mem_game_css_url, array(), $mem_game_css_ver );
   }
 
   // Conditionally load JavaScript and CSS if the page/post contains the shortcode
@@ -53,20 +68,19 @@ class MemShortcode {
       if ( has_shortcode( $post->post_content, 'memgame' ) ) {
         // mem_debug( 'MemShortcode: It has the shortcode' );
 
+        // Enqueue the CSS file (in its own function for now)
+        self::enqueue_memgame_css();
+
         // Path to JS and CSS files
         $mem_game_js_path = MEM_GAME_PATH . 'assets/js/mem-game.js';
         $mem_game_js_url = MEM_GAME_URL . 'assets/js/mem-game.js';
-        $mem_game_css_path = MEM_GAME_PATH . 'assets/css/mem-game.css';
-        $mem_game_css_url = MEM_GAME_URL . 'assets/css/mem-game.css';
 
         // Create the version based on the file modification time
         $mem_game_js_ver = date( 'ymd-Gis', fileatime( $mem_game_js_path ) );
-        $mem_game_css_ver = date( 'ymd-Gis', fileatime( $mem_game_css_path ) );
 
         // Enqueue the files
         // The borrowed JS needs jQuery (the CodePen used ver 2.1.3, assuming the default WP ver will do)
         wp_enqueue_script( 'mem_game_js', $mem_game_js_url, array( 'jquery' ), $mem_game_js_ver, true );
-        wp_enqueue_style( 'mem_game_css', $mem_game_css_url, array(), $mem_game_css_ver );
 
         // Pass image info to the JS as localized data
         $image_ids = MemSettings::get_image_ids();

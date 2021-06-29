@@ -114,6 +114,10 @@ class MemSettings {
       // Enqueue the files
       // The borrowed JS needs jQuery
       wp_enqueue_script( 'mem_media_picker_js', $mem_media_picker_js_url, array( 'jquery' ), $mem_media_picker_js_ver, true );
+
+      // Enqueue the frontend CSS file to make the card images look accurate
+      require_once MEM_GAME_PATH . 'includes/class-mem-shortcode.php';
+      MemShortcode::enqueue_memgame_css();
       
     }
   }
@@ -156,9 +160,21 @@ class MemSettings {
     $valid_image = is_array( $image_src );
 
     ?>
-    <div class="mem_game_card_image" id="mem_game_<?php echo $option_name; ?>_image" style="display: flex; align-items: center;">
+    <!-- <div class="mem_game_card_image" id="mem_game_<?php //echo $option_name; ?>_image" style="display: flex; align-items: center;"> -->
+    <div class="mem_game_card_image" id="mem_game_<?php echo $option_name; ?>_image">
       <div class="custom-img-container<?php echo $valid_image ? '' : ' hidden'; ?>">
-        <image id="img-<?php echo $option_name; ?>" src="<?php echo $valid_image ? $image_src[0] : ''; ?>" alt="Card Image" style="max-height: 100px; max-width: 100px;">
+        <div class="mg-wrap" style="width: 100px;">
+          <div class="mg-card">
+            <div class="mg-inside">
+              <div class="mg-back">
+                <img id="img-<?php echo $option_name; ?>" src="<?php echo $valid_image ? $image_src[0] : ''; ?>" alt="Card Image">
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--
+        <image id="img-<?php //echo $option_name; ?>" src="<?php //echo $valid_image ? $image_src[0] : ''; ?>" alt="Card Image" style="max-height: 100px; max-width: 100px;">
+        -->
       </div>
       <p class="hide-if-no-js">
         <a class="button upload-custom-img" href="<?php echo $upload_link ?>" style="margin-left: 1em;">

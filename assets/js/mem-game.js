@@ -134,11 +134,11 @@
   // Original (for the most part) code from CodePen
   var Memory = {
     init: function (cards) {
-      this.$game = $(".game");
-      this.$modal = $(".modal");
-      // this.$overlay = $(".modal-overlay");
-      this.$overlay = $(".modal-wrap");
-      this.$restartButton = $("button.restart");
+      this.$game = $(".mg-game");
+      this.$modal = $(".mg-modal");
+      // this.$overlay = $(".mg-modal-overlay");
+      this.$overlay = $(".mg-modal-wrap");
+      this.$restartButton = $("button.mg-restart");
       this.cardsArray = $.merge(cards, cards);
       this.shuffleCards(this.cardsArray);
       this.setup();
@@ -151,7 +151,7 @@
     setup: function () {
       this.html = this.buildHTML();
       this.$game.html(this.html);
-      this.$memoryCards = $(".card");
+      this.$memoryCards = $(".mg-card");
       this.paused = false;
       this.guess = null;
       this.binding();
@@ -169,27 +169,27 @@
       var $card = $(this);
       if (
         !_.paused &&
-        !$card.find(".inside").hasClass("matched") &&
-        !$card.find(".inside").hasClass("picked")
+        !$card.find(".mg-inside").hasClass("mg-matched") &&
+        !$card.find(".mg-inside").hasClass("mg-picked")
       ) {
-        $card.find(".inside").addClass("picked");
+        $card.find(".mg-inside").addClass("mg-picked");
         if (!_.guess) {
           _.guess = $(this).attr("data-id");
         } else if (
           _.guess == $(this).attr("data-id") &&
-          !$(this).hasClass("picked")
+          !$(this).hasClass("mg-picked")
         ) {
-          $(".picked").addClass("matched");
+          $(".mg-picked").addClass("mg-matched");
           _.guess = null;
         } else {
           _.guess = null;
           _.paused = true;
           setTimeout(function () {
-            $(".picked").removeClass("picked");
+            $(".mg-picked").removeClass("mg-picked");
             Memory.paused = false;
           }, 600);
         }
-        if ($(".matched").length == $(".card").length) {
+        if ($(".mg-matched").length == $(".mg-card").length) {
           _.win();
         }
       }
@@ -259,16 +259,16 @@
         // alt="Codepen" /></div></div>\
         // </div>';
         frag +=
-          '<div class="card" data-id="' +
+          '<div class="mg-card" data-id="' +
           v.id +
-          '"><div class="inside">\
-				<div class="front"><img src="' +
+          '"><div class="mg-inside">\
+				<div class="mg-front"><img src="' +
           v.img +
           '"\
 				alt="' +
           v.name +
           '" /></div>\
-				<div class="back"><img src="' +
+				<div class="mg-back"><img src="' +
           card_back_url +
           '"\
 				alt="Codepen" /></div></div>\
