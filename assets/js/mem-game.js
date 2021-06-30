@@ -243,7 +243,8 @@
 
     buildHTML: function () {
       var frag = "";
-      const card_back_url = mem_game_img_obj["images"]["card_back"][0];
+      const card_back_url = mem_game_img_obj["images"]["card_back"][0]["url"];
+      const card_back_fit = mem_game_img_obj["images"]["card_back"][0]["fit"];
       this.$cards.each(function (k, v) {
         // frag +=
         //   '<div class="card" data-id="' +
@@ -267,100 +268,117 @@
           '"\
 				alt="' +
           v.name +
+          '" class="mg-fit-' +
+          v.fit +
           '" /></div>\
 				<div class="mg-back"><img src="' +
           card_back_url +
           '"\
-				alt="Codepen" /></div></div>\
+				alt="Card Back" class="mg-fit-' +
+          card_back_fit +
+          '" /></div></div>\
 				</div>';
       });
       return frag;
     },
   };
 
+  // FIXME: This is cumbersome, need to use something like array map to make future proof
   var cards = [
     {
       // name: "php",
       name: "card_front_0",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/php-logo_1.png",
-      img: mem_game_img_obj["images"]["card_front"][0],
+      img: mem_game_img_obj["images"]["card_front"][0]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][0]["fit"],
       id: 1,
     },
     {
       // name: "css3",
       name: "card_front_1",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/css3-logo.png",
-      img: mem_game_img_obj["images"]["card_front"][1],
+      img: mem_game_img_obj["images"]["card_front"][1]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][1]["fit"],
       id: 2,
     },
     {
       // name: "html5",
       name: "card_front_2",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/html5-logo.png",
-      img: mem_game_img_obj["images"]["card_front"][2],
+      img: mem_game_img_obj["images"]["card_front"][2]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][2]["fit"],
       id: 3,
     },
     {
       // name: "jquery",
       name: "card_front_3",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/jquery-logo.png",
-      img: mem_game_img_obj["images"]["card_front"][3],
+      img: mem_game_img_obj["images"]["card_front"][3]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][3]["fit"],
       id: 4,
     },
     {
       // name: "javascript",
       name: "card_front_4",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/js-logo.png",
-      img: mem_game_img_obj["images"]["card_front"][4],
+      img: mem_game_img_obj["images"]["card_front"][4]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][4]["fit"],
       id: 5,
     },
     {
       // name: "node",
       name: "card_front_5",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/nodejs-logo.png",
-      img: mem_game_img_obj["images"]["card_front"][5],
+      img: mem_game_img_obj["images"]["card_front"][5]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][5]["fit"],
       id: 6,
     },
     {
       // name: "photoshop",
       name: "card_front_6",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/photoshop-logo.png",
-      img: mem_game_img_obj["images"]["card_front"][6],
+      img: mem_game_img_obj["images"]["card_front"][6]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][6]["fit"],
       id: 7,
     },
     {
       // name: "python",
       name: "card_front_7",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/python-logo.png",
-      img: mem_game_img_obj["images"]["card_front"][7],
+      img: mem_game_img_obj["images"]["card_front"][7]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][7]["fit"],
       id: 8,
     },
     {
       // name: "rails",
       name: "card_front_8",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/rails-logo.png",
-      img: mem_game_img_obj["images"]["card_front"][8],
+      img: mem_game_img_obj["images"]["card_front"][8]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][8]["fit"],
       id: 9,
     },
     {
       // name: "sass",
       name: "card_front_9",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/sass-logo.png",
-      img: mem_game_img_obj["images"]["card_front"][9],
+      img: mem_game_img_obj["images"]["card_front"][9]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][9]["fit"],
       id: 10,
     },
     {
       // name: "sublime",
       name: "card_front_10",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/sublime-logo.png",
-      img: mem_game_img_obj["images"]["card_front"][10],
+      img: mem_game_img_obj["images"]["card_front"][10]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][10]["fit"],
       id: 11,
     },
     {
       // name: "wordpress",
       name: "card_front_11",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/wordpress-logo.png",
-      img: mem_game_img_obj["images"]["card_front"][11],
+      img: mem_game_img_obj["images"]["card_front"][11]["url"],
+      fit: mem_game_img_obj["images"]["card_front"][11]["fit"],
       id: 12,
     },
   ];

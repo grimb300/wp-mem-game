@@ -83,17 +83,11 @@ class MemShortcode {
         wp_enqueue_script( 'mem_game_js', $mem_game_js_url, array( 'jquery' ), $mem_game_js_ver, true );
 
         // Pass image info to the JS as localized data
-        $image_ids = MemSettings::get_image_ids();
-        $image_urls = MemSettings::get_image_urls();
-        // mem_debug( 'Image IDs' );
-        // mem_debug( $image_ids );
-        // mem_debug( 'Image URLs' );
-        // mem_debug( $image_urls );
         wp_localize_script(
           'mem_game_js',
           'mem_game_img_obj',
           array(
-            'images' => $image_urls,
+            'images' => MemSettings::get_localized_image_data(),
             'ajax_url' => admin_url( 'admin-ajax.php' ),
             'nonce' => wp_create_nonce( 'mem_game_stats' )
           )

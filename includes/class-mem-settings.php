@@ -276,5 +276,32 @@ class MemSettings {
     // Return the info
     return $return_info;
   }
+
+  // Return the image types
+  private static function get_image_types() {
+    return array_keys( self::$images );
+  }
+
+  // Get the localized data to be sent to the front end JS
+  public static function get_localized_image_data() {
+    $return_data = array();
+
+    // Iterate across the image types
+    foreach ( self::get_image_types() as $image_type ) {
+      $return_data[ $image_type ] = array_map(
+        function ( $info ) {
+          // Return the fit and url from the image type info
+          return array(
+            'fit' => $info[ 'fit' ],
+            'url' => $info[ 'url' ]
+          );
+        },
+        self::get_image_type_info( $image_type )
+      );
+    }
+
+    // Return the data
+    return $return_data;
+  }
   
 }
