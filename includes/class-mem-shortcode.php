@@ -29,13 +29,23 @@ class MemShortcode {
   // TODO: Eventually the configuration will be in $params
   public function memgame_display( $params ) {
     $game = <<<END
+    <div class="mg-how-to-play">
+      <h5>How to play:</h5>
+      <ol>
+        <li>Select one of the face down cards by clicking on it.</li>
+        <li>Select a second face down card, attempting to find a match to the first card.</li>
+        <li>If the cards match, both will remain face up. Otherwise, the cards will turn face down again.</li>
+        <li>Repeat until all cards are face up.</li>
+      </ol>
+    </div>
     <div class="mg-wrap">
       <div class="mg-game"></div>
       <div class="mg-modal-wrap">
         <div class="mg-modal-overlay">
           <div class="mg-modal">
             <h2 class="mg-winner">You Rock!</h2>
-            <button class="mg-restart">Play Again?</button>
+            <button class="mg-restart">Play Again</button>
+            <a href="http://localhost:4480/"><button class="mg-leave">Quit</button></a>
           </div>
         </div>
       </div>

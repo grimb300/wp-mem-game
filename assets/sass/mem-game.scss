@@ -89,7 +89,7 @@
 }
 
 .mg-modal-wrap {
-  display: none;
+  // display: none;
   background: rgba(0, 0, 0, 0.8);
   position: absolute;
   top: 0;
@@ -109,7 +109,7 @@
 }
 
 .mg-modal {
-  display: none;
+  // display: none;
   width: 80%;
   margin: 0 auto;
   background: white;
@@ -122,11 +122,12 @@
     text-shadow: 0px 3px 0 black;
   }
 
-  .mg-restart {
+  .mg-restart,
+  .mg-leave {
     margin: 30px auto;
-    padding: 20px 30px;
+    padding: 10px 20px;
     display: block;
-    font-size: 30px;
+    font-size: 25px;
     background: linear-gradient(#4d4d4d, #222);
     border: 1px solid #222;
     border-radius: 5px;
