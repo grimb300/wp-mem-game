@@ -40,6 +40,13 @@ class MemSettings {
     ),
   );
 
+  private static $default_winner_screen_options = array(
+    'winner_msg' => 'You Rock!',
+    'play_again_txt' => 'Play Again',
+    'quit_txt' => 'Quit',
+    'quit_url' => ''
+  );
+
   /* *******
    * Methods
    * *******/
@@ -49,6 +56,10 @@ class MemSettings {
     register_setting(
       'mem_game_settings', // Settings group (page slug)
       'mem_game_images'    // Setting name
+    );
+    register_setting(
+      'mem_game_settings', // Settings group (page slug)
+      'mem_game_winner_screen'    // Setting name
     );
 
     /* **********************
@@ -65,6 +76,18 @@ class MemSettings {
       ),                                  //
       'mem_game_settings'                 // Settings page to show the section
     );
+
+    // Winner screen section
+    add_settings_section(
+      'mem_game_winner_screen',             // ID tag of the section
+      'Winner Screen',                      // Section title
+      array(                              // Callback for the section description
+        'MemGame\MemSettings',            //
+        'display_winner_screen_description' //
+      ),                                  //
+      'mem_game_settings'                 // Settings page to show the section
+    );
+    
     /* **************************
      * END Settings page sections
      * **************************/
@@ -91,7 +114,73 @@ class MemSettings {
       );
     }
 
-    // Card back image
+    add_settings_field(
+      'winner_msg',  // ID tag of the field
+      'Winner Message', // Field title
+      array(            // Callback for the field input
+        'MemGame\MemSettings',
+        'display_winner_screen_input'
+      ),
+      'mem_game_settings',     // ID of the page to show the field
+      'mem_game_winner_screen',  // ID of the section to show the field
+      array(                   // Args passed to the callback
+        'label_for' => 'winner_msg',
+        'class' => 'mem_game_settings_row',
+        'parent_option' => 'mem_game_winner_screen',
+        'input_type' => 'text',
+      )
+    );
+
+    add_settings_field(
+      'play_again_txt',  // ID tag of the field
+      'Play Again Button Text', // Field title
+      array(            // Callback for the field input
+        'MemGame\MemSettings',
+        'display_winner_screen_input'
+      ),
+      'mem_game_settings',     // ID of the page to show the field
+      'mem_game_winner_screen',  // ID of the section to show the field
+      array(                   // Args passed to the callback
+        'label_for' => 'play_again_txt',
+        'class' => 'mem_game_settings_row',
+        'parent_option' => 'mem_game_winner_screen',
+        'input_type' => 'text',
+      )
+    );
+
+    add_settings_field(
+      'quit_txt',  // ID tag of the field
+      'Quit Button Text', // Field title
+      array(            // Callback for the field input
+        'MemGame\MemSettings',
+        'display_winner_screen_input'
+      ),
+      'mem_game_settings',     // ID of the page to show the field
+      'mem_game_winner_screen',  // ID of the section to show the field
+      array(                   // Args passed to the callback
+        'label_for' => 'quit_txt',
+        'class' => 'mem_game_settings_row',
+        'parent_option' => 'mem_game_winner_screen',
+        'input_type' => 'text',
+      )
+    );
+
+    add_settings_field(
+      'quit_url',  // ID tag of the field
+      'Quit Button Link URL', // Field title
+      array(            // Callback for the field input
+        'MemGame\MemSettings',
+        'display_winner_screen_input'
+      ),
+      'mem_game_settings',     // ID of the page to show the field
+      'mem_game_winner_screen',  // ID of the section to show the field
+      array(                   // Args passed to the callback
+        'label_for' => 'quit_url',
+        'class' => 'mem_game_settings_row',
+        'parent_option' => 'mem_game_winner_screen',
+        'input_type' => 'url',
+      )
+    );
 
     /* *******************
      * END Settings fields
@@ -136,6 +225,13 @@ class MemSettings {
   public static function display_card_images_description( $args ) {
     ?>
     <p id="<?php echo esc_attr( $args[ 'id' ] ); ?>"><?php esc_html_e( 'Images for the front and back of the cards used in the memory game' ); ?></p>
+    <?php
+  }
+
+  // Display the settings page winner screen section description
+  public static function display_winner_screen_description( $args ) {
+    ?>
+    <p id="<?php echo esc_attr( $args[ 'id' ] ); ?>"><?php esc_html_e( 'Text and buttons displayed on the "winner screen" of the memory game' ); ?></p>
     <?php
   }
 
@@ -202,6 +298,22 @@ class MemSettings {
     <?php
   }
 
+  // Display the winner screen inputs
+  public static function display_winner_screen_input( $args ) {
+    // Get the current option value
+    $current_value = self::get_winner_screen_options( $args[ 'label_for' ] );
+    ?>
+    <input
+      type="<?php echo $args[ 'input_type' ]; ?>"
+      name="<?php echo sprintf( '%s[%s]', $args[ 'parent_option' ], $args[ 'label_for' ] ); ?>"
+      id="<?php echo $args[ 'label_for' ]; ?>"
+      value="<?php echo $current_value; ?>"
+      <?php if ( "url" === $args[ 'input_type' ] ) { echo 'placeholder="https://"'; } ?>
+      size="40"
+    />
+    <?php
+  }
+
   // Display the settings page
   public static function display_settings_page() {
     // Check user capabilities
@@ -228,6 +340,34 @@ class MemSettings {
     <h1>Memory Game Statistics</h1>
     <?php $stats = MemStats::get_analyzed_stats(); ?>
     <?php
+  }
+
+  // Retrieve winner screen options
+  public static function get_winner_screen_options( $sub_option = null ) {
+    // Get the current options
+    $current_options = get_option( 'mem_game_winner_screen' );
+
+    // If the user wants a particular sub-option
+    if ( ! is_null( $sub_option ) ) {
+      // Return the option out of current options if it exists
+      if ( is_array( $current_options ) && array_key_exists( $sub_option, $current_options ) ) {
+        return $current_options[ $sub_option ];
+      }
+      // Return out of the option defaults if it exists there
+      if ( array_key_exists( $sub_option, self::$default_winner_screen_options ) ) {
+        return self::$default_winner_screen_options[ $sub_option ];
+      }
+      // Return null if we get this far
+      return null;
+    }
+
+    // Return the entire option array if it exists
+    if ( is_array( $current_options ) ) {
+      return $current_options;
+    }
+
+    // Finally return the default array
+    return self::$default_winner_screen_options;
   }
 
   // Retrieve all image options

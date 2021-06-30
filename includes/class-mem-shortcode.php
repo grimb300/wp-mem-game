@@ -28,6 +28,14 @@ class MemShortcode {
   // Based on this CodePen: https://codepen.io/natewiley/pen/HBrbL
   // TODO: Eventually the configuration will be in $params
   public function memgame_display( $params ) {
+    // Get the winner screen text out of options
+    $winner_screen_info = MemSettings::get_winner_screen_options();
+    $winner_msg = $winner_screen_info[ 'winner_msg' ];
+    $play_again_txt = $winner_screen_info[ 'play_again_txt' ];
+    $quit_txt = $winner_screen_info[ 'quit_txt' ];
+    $quit_url = $winner_screen_info[ 'quit_url' ];
+
+    // Build the game layout
     $game = <<<END
     <div class="mg-how-to-play">
       <h5>How to play:</h5>
@@ -43,9 +51,9 @@ class MemShortcode {
       <div class="mg-modal-wrap">
         <div class="mg-modal-overlay">
           <div class="mg-modal">
-            <h2 class="mg-winner">You Rock!</h2>
-            <button class="mg-restart">Play Again</button>
-            <a href="http://localhost:4480/"><button class="mg-leave">Quit</button></a>
+            <h2 class="mg-winner">$winner_msg</h2>
+            <button class="mg-restart">$play_again_txt</button>
+            <a href="$quit_url"><button class="mg-leave">$quit_txt</button></a>
           </div>
         </div>
       </div>
