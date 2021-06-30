@@ -9,9 +9,20 @@ jQuery(function ($) {
     const addImgLink = $(this).find(".upload-custom-img");
     const imgElement = $(this).find("img");
     const imgIdInput = $(this).find(".custom-img-id");
+    const imgFitSelect = $(this).find(".select-img-fit");
 
     // The media frame is scoped to this picker, don't create it yet
     let frame;
+
+    // Handle changes to the image fit select
+    imgFitSelect.on("change", function (event) {
+      // console.log(`Saw fit selector change to ${$(this).val()}`);
+      if ($(this).val() === "cover") {
+        imgElement.addClass("mg-fit-cover");
+      } else {
+        imgElement.removeClass("mg-fit-cover");
+      }
+    });
 
     // Handle add/update image clicks
     addImgLink.on("click", function (event) {

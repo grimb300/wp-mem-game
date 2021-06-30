@@ -13,31 +13,29 @@ class MemSettings {
    * **********/
 
   public static $images = array(
-    array(
-      'type' => 'card_back',
-      'title' => 'Card Back',
+    'card_back' => array(
+      'title' => 'Card Back Image',
       'num_imgs' => 1,
-      'default_urls' => array(
-        MEM_GAME_URL . 'assets/images/social-memory.png',
+      'defaults' => array(
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/social-memory.png' ),
       ),
     ),
-    array(
-      'type' => 'card_front',
-      'title' => 'Card Front',
+    'card_front' => array(
+      'title' => 'Card Front Images',
       'num_imgs' => 12,
-      'default_urls' => array(
-        MEM_GAME_URL . 'assets/images/dropbox-logo.png',
-        MEM_GAME_URL . 'assets/images/facebook-logo.png',
-        MEM_GAME_URL . 'assets/images/instagram-logo.png',
-        MEM_GAME_URL . 'assets/images/linkedin-logo.png',
-        MEM_GAME_URL . 'assets/images/pinterest-logo.png',
-        MEM_GAME_URL . 'assets/images/skype-logo.png',
-        MEM_GAME_URL . 'assets/images/snapchat-logo.png',
-        MEM_GAME_URL . 'assets/images/spotify-logo.png',
-        MEM_GAME_URL . 'assets/images/twitter-logo.png',
-        MEM_GAME_URL . 'assets/images/vimeo-logo.png',
-        MEM_GAME_URL . 'assets/images/whatsapp-logo.png',
-        MEM_GAME_URL . 'assets/images/youtube-logo.png',
+      'defaults' => array(
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/dropbox-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/facebook-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/instagram-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/linkedin-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/pinterest-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/skype-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/snapchat-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/spotify-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/twitter-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/vimeo-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/whatsapp-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/youtube-logo.png' ),
       ),
     ),
   );
@@ -76,21 +74,19 @@ class MemSettings {
      * ***************/
 
     // Iterate across all images in self::$images
-    foreach( self::$images as $info ) {
+    foreach( self::$images as $image_type => $info ) {
       add_settings_field(
-        $info[ 'type' ], // ID tag of the field
-        $info[ 'title' ] . ' Image', // Field title
-        array(                   // Callback for the field input
+        $image_type,  // ID tag of the field
+        $info[ 'title' ], // Field title
+        array(            // Callback for the field input
           'MemGame\MemSettings',
           'display_image_input'
         ),
         'mem_game_settings',     // ID of the page to show the field
         'mem_game_card_images',  // ID of the section to show the field
         array(                   // Args passed to the callback
-          'label_for' => $info[ 'type' ],
+          'label_for' => $image_type,
           'class' => 'mem_game_settings_row',
-          'default_urls' => $info[ 'default_urls' ],
-          'num_imgs' => $info[ 'num_imgs' ],
         )
       );
     }
@@ -150,17 +146,9 @@ class MemSettings {
   //   Random tutorial (looks like it may be a little old)
   //     https://jeroensormani.com/how-to-include-the-wordpress-media-selector-in-your-plugin/
   public static function display_image_input( $args ) {
-    // Get the name of the setting value to be displayed, number of images and the default image urls
-    $option_name = $args[ 'label_for' ];
-    $num_imgs = $args[ 'num_imgs' ];
-    $default_urls = $args[ 'default_urls' ];
-
-    // Get the current value
-    $image_ids = self::get_image_ids();
-    $this_image_id =
-      is_array( $image_ids ) && array_key_exists( $option_name, $image_ids )
-      ? $image_ids[ $option_name ]
-      : array_fill( 0, $num_imgs, -1 );
+    // Get the info for the image type to be displayed
+    $image_type = $args[ 'label_for' ];
+    $image_info = self::get_image_type_info( $image_type );
 
     /***************************************************
      * Display the media picker
@@ -171,29 +159,40 @@ class MemSettings {
     $upload_link = esc_url( get_upload_iframe_src( 'image' ) );
     
     ?>
+    <!-- Adding some inline styles not in the frontend CSS -->
+    <style>
+      .img-picker-control {
+        margin: 5px auto 0;
+      }
+    </style>
     <div class="mg-wrap">
-      <!-- Override the default grid template with 6 columns at 100px each -->
+      <!-- Override the default grid template with 6 columns at 100px each and a grid gap of 10px -->
       <div class="mg-game" style="grid-template-columns: repeat(6, 100px);">
       <?php
-      // Loop based on the number of images associated with this option
-      for ( $i = 0; $i < $num_imgs; $i++ ) {
-        // Get the image src
-        $image_src = wp_get_attachment_image_src( $this_image_id[ $i ], 'full' );
-        // For convenience, see if the array is valid
-        $valid_image = is_array( $image_src );
+      // Loop across the image info associated with this option
+      foreach ( $image_info as $index => $info ) {
         ?>
         <div div class="mg-card" style="width: 100px;">
           <div class="mg-inside">
             <div class="mg-back">
-              <img id="img-<?php echo sprintf( '%s-%d', $option_name, $i ); ?>" src="<?php echo $valid_image ? $image_src[0] : $default_urls[ $i ]; ?>" alt="Card Image">
+              <img class="mg-fit-<?php echo $info[ 'fit' ]; ?>" id="img-<?php echo sprintf( '%s-%d', $image_type, $index ); ?>" src="<?php echo $info[ 'url' ]; ?>" alt="Card Image">
             </div> <!-- .mg-back -->
           </div> <!-- .mg-inside -->
-          <p class="hide-if-no-js">
+          <div class="img-picker-control">
+            <label class="screen-reader-text" for="scale-<?php echo sprintf( '%s-%s', $image_type, $index ) ?>">Image Scaling:</label>
+            <select class="select-img-fit" id="scale-<?php echo sprintf( '%s-%s', $image_type, $index ) ?>" name="mem_game_images[<?php echo $image_type; ?>][<?php echo $index; ?>][fit]">
+              <option value="scale-down">Scale</option>
+              <option value="cover"<?php if ( 'cover' === $info[ 'fit' ] ) { echo ' selected'; } ?>>Cover</option>
+            </select>
+          </div>
+          <div class="img-picker-control">
             <a class="button upload-custom-img" href="<?php echo $upload_link ?>">
               <?php _e('Update'); ?>
             </a>
-          </p>
-          <input class="custom-img-id" name="mem_game_images[<?php echo $option_name; ?>][<?php echo $i; ?>]" type="hidden" value="<?php echo esc_attr( $this_image_id[$i] ); ?>" />
+          </div>
+          <!-- <p class="hide-if-no-js">
+          </p> -->
+          <input class="custom-img-id" name="mem_game_images[<?php echo $image_type; ?>][<?php echo $index; ?>][id]" type="hidden" value="<?php echo esc_attr( $info[ 'id' ] ); ?>" />
         </div> <!-- .mg-card -->
         <?php
       }
@@ -231,76 +230,51 @@ class MemSettings {
     <?php
   }
 
-  // Retrieve the image IDs
-  public static function get_image_ids() {
+  // Retrieve all image options
+  private static function get_image_option() {
     return get_option( 'mem_game_images' );
   }
 
-  // Retrieve the image source URLs
-  // This will return an associative array of ( image_type => array( image_urls ) )
-  // and will return a default image_url for missing images
-  // FIXME: This makes the assumption that the $images array defined above is the golden copy
-  //        regarding the type and number of images.
-  //        The indices contained in the options can only modify the default URLs.
-  //        If the number of cards is every configurable, this assumption breaks.
-  public static function get_image_urls() {
-    // Image types
-    // TODO: This should be a class property
-    $image_types = self::get_image_types();
+  // Retrieve options for a particular image type
+  private static function get_image_type_option( $image_type ) {
+    $all_options = self::get_image_option();
+    return $all_options[ $image_type ];
+  }
 
-    // Get the IDs stored in options
-    $image_ids = self::get_image_ids();
+  // Get the info for a given image type
+  private static function get_image_type_info( $image_type ) {
+    // Get the current option value for this image
+    $image_type_option = self::get_image_type_option( $image_type );
 
-    // Convert the IDs into URLs, using a default value if no ID is present
-    $image_urls = array();
-    foreach ( $image_types as $image_type ) {
-      // Get the default URLs for this image type
-      $image_defaults = self::get_image_default_url( $image_type );
+    // FIXME: Using the "defaults" defined above as the golden copy of how many images of each type there are.
+    //        This will break if/when the number of cards is ever configurable.
 
-      // Convert the image IDs for this type to URLs
-      $converted_urls = array_map(
-        function ( $image_id ) {
+    // Grab the defaults for this image type and preload the return value
+    $return_info = self::$images[ $image_type ][ 'defaults' ];
+
+    // If the option exists and is an array,
+    // iterate across the images in the option updating the return values as needed
+    if ( is_array( $image_type_option ) ) {
+      foreach ( $image_type_option as $index => $option ) {
+        // If this index is in the defaults and the image ID exists, get the image source info for that id
+        if ( array_key_exists( $index, $return_info ) && is_array( $option ) && array_key_exists( 'id', $option ) ) {
           // Get the image source
-          $image_src = wp_get_attachment_image_src( $image_id, 'full' );
-          // If a valid image is found, return the URL, else return an empty string ''
-          return is_array( $image_src ) ? $image_src[0] : '';
-        },
-        // If there aren't any image IDs for this type, use an empty array
-        is_array( $image_ids[ $image_type ] ) ? $image_ids[ $image_type ] : array()
-      );
+          $image_src = wp_get_attachment_image_src( $option[ 'id' ], 'full' );
 
-      // Merge the converted URLs into the defaults and update the image URLs array
-      foreach ( $image_defaults as $image_index => $image_default ) {
-        $image_urls[ $image_type ][ $image_index ] =
-          empty( $converted_urls[ $image_index ] )
-          ? $image_default
-          : $converted_urls[ $image_index ];
-      }
-    }
-    return $image_urls;
-  }
+          // If a valid image is found, update the return value for this index
+          if ( is_array( $image_src ) ) {
+            $return_info[ $index ] = array(
+              'id' => $option[ 'id' ],
+              'url' => $image_src[0],
+              'fit' => array_key_exists( 'fit', $option ) ? $option[ 'fit' ] : $return_info[ $index ][ 'fit' ]
+            );
+          } // if valid image
+        } // if option has an id
+      } // foreach option
+    } // if option is an array
 
-  /**
-   * Accessor functions for the data contained in self::$images
-   */
-
-  // Get an array of image types
-  private static function get_image_types() {
-    return array_map( function ( $image ) {
-      return $image[ 'type' ];
-    }, self::$images );
-  }
-
-  // Get an array of default URLs for an image type
-  private static function get_image_default_url( $image_type ) {
-    $filtered_images = array_filter( self::$images, function( $image ) use ( $image_type ) {
-      return $image_type === $image[ 'type' ];
-    } );
-    // Since array_filter preserves keys, compact the resulting array
-    $compacted_images = array_values( $filtered_images );
-    // Assume that there is only one match
-    $this_image = $compacted_images[0];
-    return $this_image[ 'default_urls' ];
+    // Return the info
+    return $return_info;
   }
   
 }
