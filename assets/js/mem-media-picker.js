@@ -1,14 +1,13 @@
 jQuery(function ($) {
   // Get a handle for each media picker
   // var frame,
-  const mediaPickers = $(".mem_game_card_image");
+  const mediaPickers = $(".mg-card");
 
   // Iterate across all media pickers
   mediaPickers.each(function (index) {
     // Get a handle for the important elements inside each picker
     const addImgLink = $(this).find(".upload-custom-img");
-    const imgContainer = $(this).find(".custom-img-container");
-    const imgElement = imgContainer.find("img");
+    const imgElement = $(this).find("img");
     const imgIdInput = $(this).find(".custom-img-id");
 
     // The media frame is scoped to this picker, don't create it yet
@@ -41,7 +40,6 @@ jQuery(function ($) {
 
         // Send the attachment URL to our image src attribute and unhide the image container.
         imgElement.attr("src", attachment.url);
-        imgContainer.removeClass("hidden");
 
         // Send the attachment id to our hidden input
         imgIdInput.val(attachment.id);

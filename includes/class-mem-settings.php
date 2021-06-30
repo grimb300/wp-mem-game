@@ -13,19 +13,33 @@ class MemSettings {
    * **********/
 
   public static $images = array(
-    array( 'type' => 'card_back', 'title' => 'Card Back', 'default_url' => MEM_GAME_URL . 'assets/images/social-memory.png' ),
-    array( 'type' => 'card_front_0', 'title' => 'Card Front[0]', 'default_url' => MEM_GAME_URL . 'assets/images/dropbox-logo.png' ),
-    array( 'type' => 'card_front_1', 'title' => 'Card Front[1]', 'default_url' => MEM_GAME_URL . 'assets/images/facebook-logo.png' ),
-    array( 'type' => 'card_front_2', 'title' => 'Card Front[2]', 'default_url' => MEM_GAME_URL . 'assets/images/instagram-logo.png' ),
-    array( 'type' => 'card_front_3', 'title' => 'Card Front[3]', 'default_url' => MEM_GAME_URL . 'assets/images/linkedin-logo.png' ),
-    array( 'type' => 'card_front_4', 'title' => 'Card Front[4]', 'default_url' => MEM_GAME_URL . 'assets/images/pinterest-logo.png' ),
-    array( 'type' => 'card_front_5', 'title' => 'Card Front[5]', 'default_url' => MEM_GAME_URL . 'assets/images/skype-logo.png' ),
-    array( 'type' => 'card_front_6', 'title' => 'Card Front[6]', 'default_url' => MEM_GAME_URL . 'assets/images/snapchat-logo.png' ),
-    array( 'type' => 'card_front_7', 'title' => 'Card Front[7]', 'default_url' => MEM_GAME_URL . 'assets/images/spotify-logo.png' ),
-    array( 'type' => 'card_front_8', 'title' => 'Card Front[8]', 'default_url' => MEM_GAME_URL . 'assets/images/twitter-logo.png' ),
-    array( 'type' => 'card_front_9', 'title' => 'Card Front[9]', 'default_url' => MEM_GAME_URL . 'assets/images/vimeo-logo.png' ),
-    array( 'type' => 'card_front_10', 'title' => 'Card Front[10]', 'default_url' => MEM_GAME_URL . 'assets/images/whatsapp-logo.png' ),
-    array( 'type' => 'card_front_11', 'title' => 'Card Front[11]', 'default_url' => MEM_GAME_URL . 'assets/images/youtube-logo.png' ),
+    array(
+      'type' => 'card_back',
+      'title' => 'Card Back',
+      'num_imgs' => 1,
+      'default_urls' => array(
+        MEM_GAME_URL . 'assets/images/social-memory.png',
+      ),
+    ),
+    array(
+      'type' => 'card_front',
+      'title' => 'Card Front',
+      'num_imgs' => 12,
+      'default_urls' => array(
+        MEM_GAME_URL . 'assets/images/dropbox-logo.png',
+        MEM_GAME_URL . 'assets/images/facebook-logo.png',
+        MEM_GAME_URL . 'assets/images/instagram-logo.png',
+        MEM_GAME_URL . 'assets/images/linkedin-logo.png',
+        MEM_GAME_URL . 'assets/images/pinterest-logo.png',
+        MEM_GAME_URL . 'assets/images/skype-logo.png',
+        MEM_GAME_URL . 'assets/images/snapchat-logo.png',
+        MEM_GAME_URL . 'assets/images/spotify-logo.png',
+        MEM_GAME_URL . 'assets/images/twitter-logo.png',
+        MEM_GAME_URL . 'assets/images/vimeo-logo.png',
+        MEM_GAME_URL . 'assets/images/whatsapp-logo.png',
+        MEM_GAME_URL . 'assets/images/youtube-logo.png',
+      ),
+    ),
   );
 
   /* *******
@@ -33,8 +47,6 @@ class MemSettings {
    * *******/
 
   public static function init() {
-    // mem_debug( 'MemSettings init called' );
-
     // Register the memory game settings
     register_setting(
       'mem_game_settings', // Settings group (page slug)
@@ -77,6 +89,8 @@ class MemSettings {
         array(                   // Args passed to the callback
           'label_for' => $info[ 'type' ],
           'class' => 'mem_game_settings_row',
+          'default_urls' => $info[ 'default_urls' ],
+          'num_imgs' => $info[ 'num_imgs' ],
         )
       );
     }
@@ -136,14 +150,17 @@ class MemSettings {
   //   Random tutorial (looks like it may be a little old)
   //     https://jeroensormani.com/how-to-include-the-wordpress-media-selector-in-your-plugin/
   public static function display_image_input( $args ) {
-    // Get the name of the setting value to be displayed
+    // Get the name of the setting value to be displayed, number of images and the default image urls
     $option_name = $args[ 'label_for' ];
+    $num_imgs = $args[ 'num_imgs' ];
+    $default_urls = $args[ 'default_urls' ];
 
     // Get the current value
     $image_ids = self::get_image_ids();
-    // mem_debug( 'Images using self::get_image_ids()' );
-    // mem_debug( $image_ids );
-    $this_image_id = is_array( $image_ids ) && array_key_exists( $option_name, $image_ids ) ? $image_ids[ $option_name ] : -1;
+    $this_image_id =
+      is_array( $image_ids ) && array_key_exists( $option_name, $image_ids )
+      ? $image_ids[ $option_name ]
+      : array_fill( 0, $num_imgs, -1 );
 
     /***************************************************
      * Display the media picker
@@ -152,37 +169,37 @@ class MemSettings {
 
     // Get WordPress' media upload URL
     $upload_link = esc_url( get_upload_iframe_src( 'image' ) );
-
-    // Get the image src
-    $image_src = wp_get_attachment_image_src( $this_image_id, 'full' );
-
-    // For convenience, see if the array is valid
-    $valid_image = is_array( $image_src );
-
+    
     ?>
-    <!-- <div class="mem_game_card_image" id="mem_game_<?php //echo $option_name; ?>_image" style="display: flex; align-items: center;"> -->
-    <div class="mem_game_card_image" id="mem_game_<?php echo $option_name; ?>_image">
-      <div class="custom-img-container<?php echo $valid_image ? '' : ' hidden'; ?>">
-        <div class="mg-wrap" style="width: 100px;">
-          <div class="mg-card">
-            <div class="mg-inside">
-              <div class="mg-back">
-                <img id="img-<?php echo $option_name; ?>" src="<?php echo $valid_image ? $image_src[0] : ''; ?>" alt="Card Image">
-              </div>
-            </div>
-          </div>
-        </div>
-        <!--
-        <image id="img-<?php //echo $option_name; ?>" src="<?php //echo $valid_image ? $image_src[0] : ''; ?>" alt="Card Image" style="max-height: 100px; max-width: 100px;">
-        -->
-      </div>
-      <p class="hide-if-no-js">
-        <a class="button upload-custom-img" href="<?php echo $upload_link ?>" style="margin-left: 1em;">
-          <?php $valid_image ? _e('Update') : _e('Add') ?>
-        </a>
-      </p>
-      <input class="custom-img-id" name="mem_game_images[<?php echo $option_name ?>]" type="hidden" value="<?php echo esc_attr( $this_image_id ); ?>" />
-    </div>
+    <div class="mg-wrap">
+      <!-- Override the default grid template with 6 columns at 100px each -->
+      <div class="mg-game" style="grid-template-columns: repeat(6, 100px);">
+      <?php
+      // Loop based on the number of images associated with this option
+      for ( $i = 0; $i < $num_imgs; $i++ ) {
+        // Get the image src
+        $image_src = wp_get_attachment_image_src( $this_image_id[ $i ], 'full' );
+        // For convenience, see if the array is valid
+        $valid_image = is_array( $image_src );
+        ?>
+        <div div class="mg-card" style="width: 100px;">
+          <div class="mg-inside">
+            <div class="mg-back">
+              <img id="img-<?php echo sprintf( '%s-%d', $option_name, $i ); ?>" src="<?php echo $valid_image ? $image_src[0] : $default_urls[ $i ]; ?>" alt="Card Image">
+            </div> <!-- .mg-back -->
+          </div> <!-- .mg-inside -->
+          <p class="hide-if-no-js">
+            <a class="button upload-custom-img" href="<?php echo $upload_link ?>">
+              <?php _e('Update'); ?>
+            </a>
+          </p>
+          <input class="custom-img-id" name="mem_game_images[<?php echo $option_name; ?>][<?php echo $i; ?>]" type="hidden" value="<?php echo esc_attr( $this_image_id[$i] ); ?>" />
+        </div> <!-- .mg-card -->
+        <?php
+      }
+      ?>
+      </div> <!-- .mg-game -->
+    </div> <!-- .mg-wrap -->
     <?php
   }
 
@@ -216,41 +233,51 @@ class MemSettings {
 
   // Retrieve the image IDs
   public static function get_image_ids() {
-    // mem_debug( 'get_image_ids called, will return' );
-    // mem_debug( get_option( 'mem_game_images' ) );
     return get_option( 'mem_game_images' );
   }
 
   // Retrieve the image source URLs
-  // This will return an associative array of ( image_type => image_url ) and will return a default image_url for missing images
+  // This will return an associative array of ( image_type => array( image_urls ) )
+  // and will return a default image_url for missing images
+  // FIXME: This makes the assumption that the $images array defined above is the golden copy
+  //        regarding the type and number of images.
+  //        The indices contained in the options can only modify the default URLs.
+  //        If the number of cards is every configurable, this assumption breaks.
   public static function get_image_urls() {
     // Image types
     // TODO: This should be a class property
     $image_types = self::get_image_types();
-    // Get the IDs
-    $image_ids = self::get_image_ids();
-    // Convert the IDs into URLs, using a default value if no ID is present
-    $image_urls = array_map(
-      function ( $image_type ) use ( $image_ids ) {
-        // If $image_ids contains this image type...
-        if ( array_key_exists( $image_type, $image_ids ) ) {
-          // Get the image source
-          $image_src = wp_get_attachment_image_src( $image_ids[ $image_type ], 'full' );
-          // If a valid image is found, return the URL
-          if ( is_array( $image_src ) ) {
-            return $image_src[0];
-          }
-        }
 
-        // If we make it this far, the image doesn't exist, return a default image
-        // mem_debug( 'Returning a default image' );
-        // FIXME: Make the default images a class property
-        return self::get_image_default_url( $image_type );
-      },
-      $image_types
-    );
-    // Return combined array (image_type => image_url)
-    return array_combine( $image_types, $image_urls );
+    // Get the IDs stored in options
+    $image_ids = self::get_image_ids();
+
+    // Convert the IDs into URLs, using a default value if no ID is present
+    $image_urls = array();
+    foreach ( $image_types as $image_type ) {
+      // Get the default URLs for this image type
+      $image_defaults = self::get_image_default_url( $image_type );
+
+      // Convert the image IDs for this type to URLs
+      $converted_urls = array_map(
+        function ( $image_id ) {
+          // Get the image source
+          $image_src = wp_get_attachment_image_src( $image_id, 'full' );
+          // If a valid image is found, return the URL, else return an empty string ''
+          return is_array( $image_src ) ? $image_src[0] : '';
+        },
+        // If there aren't any image IDs for this type, use an empty array
+        is_array( $image_ids[ $image_type ] ) ? $image_ids[ $image_type ] : array()
+      );
+
+      // Merge the converted URLs into the defaults and update the image URLs array
+      foreach ( $image_defaults as $image_index => $image_default ) {
+        $image_urls[ $image_type ][ $image_index ] =
+          empty( $converted_urls[ $image_index ] )
+          ? $image_default
+          : $converted_urls[ $image_index ];
+      }
+    }
+    return $image_urls;
   }
 
   /**
@@ -264,9 +291,8 @@ class MemSettings {
     }, self::$images );
   }
 
-  // Get the default URL for an image type
+  // Get an array of default URLs for an image type
   private static function get_image_default_url( $image_type ) {
-    // mem_debug( 'Getting default URL for ' . $image_type );
     $filtered_images = array_filter( self::$images, function( $image ) use ( $image_type ) {
       return $image_type === $image[ 'type' ];
     } );
@@ -274,7 +300,7 @@ class MemSettings {
     $compacted_images = array_values( $filtered_images );
     // Assume that there is only one match
     $this_image = $compacted_images[0];
-    return $this_image[ 'default_url' ];
+    return $this_image[ 'default_urls' ];
   }
   
 }

@@ -243,7 +243,7 @@
 
     buildHTML: function () {
       var frag = "";
-      const card_back_url = mem_game_img_obj["images"]["card_back"];
+      const card_back_url = mem_game_img_obj["images"]["card_back"][0];
       this.$cards.each(function (k, v) {
         // frag +=
         //   '<div class="card" data-id="' +
@@ -283,84 +283,84 @@
       // name: "php",
       name: "card_front_0",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/php-logo_1.png",
-      img: mem_game_img_obj["images"]["card_front_0"],
+      img: mem_game_img_obj["images"]["card_front"][0],
       id: 1,
     },
     {
       // name: "css3",
       name: "card_front_1",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/css3-logo.png",
-      img: mem_game_img_obj["images"]["card_front_1"],
+      img: mem_game_img_obj["images"]["card_front"][1],
       id: 2,
     },
     {
       // name: "html5",
       name: "card_front_2",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/html5-logo.png",
-      img: mem_game_img_obj["images"]["card_front_2"],
+      img: mem_game_img_obj["images"]["card_front"][2],
       id: 3,
     },
     {
       // name: "jquery",
       name: "card_front_3",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/jquery-logo.png",
-      img: mem_game_img_obj["images"]["card_front_3"],
+      img: mem_game_img_obj["images"]["card_front"][3],
       id: 4,
     },
     {
       // name: "javascript",
       name: "card_front_4",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/js-logo.png",
-      img: mem_game_img_obj["images"]["card_front_4"],
+      img: mem_game_img_obj["images"]["card_front"][4],
       id: 5,
     },
     {
       // name: "node",
       name: "card_front_5",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/nodejs-logo.png",
-      img: mem_game_img_obj["images"]["card_front_5"],
+      img: mem_game_img_obj["images"]["card_front"][5],
       id: 6,
     },
     {
       // name: "photoshop",
       name: "card_front_6",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/photoshop-logo.png",
-      img: mem_game_img_obj["images"]["card_front_6"],
+      img: mem_game_img_obj["images"]["card_front"][6],
       id: 7,
     },
     {
       // name: "python",
       name: "card_front_7",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/python-logo.png",
-      img: mem_game_img_obj["images"]["card_front_7"],
+      img: mem_game_img_obj["images"]["card_front"][7],
       id: 8,
     },
     {
       // name: "rails",
       name: "card_front_8",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/rails-logo.png",
-      img: mem_game_img_obj["images"]["card_front_8"],
+      img: mem_game_img_obj["images"]["card_front"][8],
       id: 9,
     },
     {
       // name: "sass",
       name: "card_front_9",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/sass-logo.png",
-      img: mem_game_img_obj["images"]["card_front_9"],
+      img: mem_game_img_obj["images"]["card_front"][9],
       id: 10,
     },
     {
       // name: "sublime",
       name: "card_front_10",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/sublime-logo.png",
-      img: mem_game_img_obj["images"]["card_front_10"],
+      img: mem_game_img_obj["images"]["card_front"][10],
       id: 11,
     },
     {
       // name: "wordpress",
       name: "card_front_11",
       // img: "https://s3-us-west-2.amazonaws.com/s.cdpn.io/74196/wordpress-logo.png",
-      img: mem_game_img_obj["images"]["card_front_11"],
+      img: mem_game_img_obj["images"]["card_front"][11],
       id: 12,
     },
   ];

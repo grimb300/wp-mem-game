@@ -81,7 +81,7 @@ class MemStats {
 
   // Start a new game
   public static function mem_game_start_ajax_handler() {
-    mem_debug( 'Executing mem_game_start' );
+    // mem_debug( 'Executing mem_game_start' );
     global $wpdb;
     $full_table_name = $wpdb->prefix . self::$table_name;
 
@@ -104,8 +104,8 @@ class MemStats {
 
     // Get the session out of the database table
     $session = $wpdb->get_results( "SELECT * FROM `$full_table_name` WHERE id = $session_id;", ARRAY_A );
-    mem_debug( 'Query results for session ID ' . $session_id );
-    mem_debug( $session );
+    // mem_debug( 'Query results for session ID ' . $session_id );
+    // mem_debug( $session );
 
     // If no session was found, create one
     if ( empty( $session ) ) {
@@ -117,7 +117,7 @@ class MemStats {
         )
       );
       $session_id = $wpdb->insert_id;
-      mem_debug( sprintf( 'Created new session (%d)', $session_id ) );
+      // mem_debug( sprintf( 'Created new session (%d)', $session_id ) );
     } else {
       // Get the game data from this session
       // NOTE: This assumes that serial IDs are unique (only one session is returned)
@@ -134,10 +134,10 @@ class MemStats {
           'id' => $session_id
         )
       );
-      mem_debug( sprintf( 'Updated session (%d)', $session_id ) );
+      // mem_debug( sprintf( 'Updated session (%d)', $session_id ) );
     }
 
-    mem_debug( 'Sending success!' );
+    // mem_debug( 'Sending success!' );
     wp_send_json_success( array( 'session_id' => $session_id ), 200 );
 
     // Die at the end of the handler
@@ -146,7 +146,7 @@ class MemStats {
 
   // Complete a game
   public static function mem_game_complete_ajax_handler() {
-    mem_debug( 'Executing mem_game_complete' );
+    // mem_debug( 'Executing mem_game_complete' );
     global $wpdb;
     $full_table_name = $wpdb->prefix . self::$table_name;
 
@@ -159,8 +159,8 @@ class MemStats {
 
     // Get the session out of the database table
     $session = $wpdb->get_results( "SELECT * FROM `$full_table_name` WHERE id = $session_id;", ARRAY_A );
-    mem_debug( 'Query results for session ID ' . $session_id );
-    mem_debug( $session );
+    // mem_debug( 'Query results for session ID ' . $session_id );
+    // mem_debug( $session );
 
     // If a session was found, update the end timestamp and clicks one
     if ( ! empty( $session ) ) {
@@ -171,7 +171,7 @@ class MemStats {
       $current_game_index = sizeof( $game_data ) - 1;
       // Add the new data
       $num_clicks = empty( $_POST[ 'data' ][ 'num_clicks' ] ) ? 0 : intval( $_POST[ 'data' ][ 'num_clicks' ] );
-      mem_debug( sprintf( 'Recording a completed game with %d clicks', $num_clicks ) );
+      // mem_debug( sprintf( 'Recording a completed game with %d clicks', $num_clicks ) );
       $game_data[ $current_game_index ][ 'end' ] = time();
       $game_data[ $current_game_index ][ 'clicks' ] = $num_clicks;
       $game_data[ $current_game_index ][ 'completed' ] = true;
@@ -186,10 +186,10 @@ class MemStats {
           'id' => $session_id
         )
       );
-      mem_debug( sprintf( 'Updated session (%d)', $session_id ) );
+      // mem_debug( sprintf( 'Updated session (%d)', $session_id ) );
     }
 
-    mem_debug( 'Sending success!' );
+    // mem_debug( 'Sending success!' );
     wp_send_json_success( array( 'message' => 'Success!!!' ), 200 );
 
     // Die at the end of the handler
@@ -198,7 +198,7 @@ class MemStats {
 
   // Abandon a game
   public static function mem_game_abandon_ajax_handler() {
-    mem_debug( 'Executing mem_game_abandon' );
+    // mem_debug( 'Executing mem_game_abandon' );
     global $wpdb;
     $full_table_name = $wpdb->prefix . self::$table_name;
 
@@ -211,8 +211,8 @@ class MemStats {
 
     // Get the session out of the database table
     $session = $wpdb->get_results( "SELECT * FROM `$full_table_name` WHERE id = $session_id;", ARRAY_A );
-    mem_debug( 'Query results for session ID ' . $session_id );
-    mem_debug( $session );
+    // mem_debug( 'Query results for session ID ' . $session_id );
+    // mem_debug( $session );
 
     // If a session was found, update the end timestamp and clicks one
     if ( ! empty( $session ) ) {
@@ -223,7 +223,7 @@ class MemStats {
       $current_game_index = sizeof( $game_data ) - 1;
       // Add the new data
       $num_clicks = empty( $_POST[ 'data' ][ 'num_clicks' ] ) ? 0 : intval( $_POST[ 'data' ][ 'num_clicks' ] );
-      mem_debug( sprintf( 'Recording an abandoned game with %d clicks', $num_clicks ) );
+      // mem_debug( sprintf( 'Recording an abandoned game with %d clicks', $num_clicks ) );
       $game_data[ $current_game_index ][ 'end' ] = time();
       $game_data[ $current_game_index ][ 'clicks' ] = $num_clicks;
       $game_data[ $current_game_index ][ 'abandoned' ] = true;
@@ -240,7 +240,7 @@ class MemStats {
       );
     }
 
-    mem_debug( 'Sending success!' );
+    // mem_debug( 'Sending success!' );
     wp_send_json_success( array( 'message' => 'Success!!!' ), 200 );
 
     // Die at the end of the handler
@@ -256,7 +256,7 @@ class MemStats {
       // This is an array of associative arrays
       $index_array = [];
       foreach ( self::$game_data_fields as $index => $key ) {
-        mem_debug( sprintf( 'Conversion using (%s => %s)', $index, $key ) );
+        // mem_debug( sprintf( 'Conversion using (%s => %s)', $index, $key ) );
         // mem_debug( 'Associative data: ' . $assoc_array[ $key ] );
         $index_array[ $index ] = $assoc_array[ $key ];
       }
@@ -349,8 +349,8 @@ class MemStats {
       );
     }, $sessions );
 
-    mem_debug( 'Analyzed sessions' );
-    mem_debug( $analyzed_sessions );
+    // mem_debug( 'Analyzed sessions' );
+    // mem_debug( $analyzed_sessions );
 
     $totals = array_reduce(
       $analyzed_sessions,
@@ -377,7 +377,7 @@ class MemStats {
 
         // If a session never completed a game, increment the counters
         if ( 0 === $s[ 'completed' ][ 'games' ] ) {
-          mem_debug( 'Never completed' );
+          // mem_debug( 'Never completed' );
           $t[ 'never_completed' ] += 1;
           $t[ 'never_completed_clicks' ] += $s[ 'abandoned' ][ 'total_clicks' ];
           $t[ 'never_completed_seconds' ] += $s[ 'abandoned' ][ 'total_seconds' ];
