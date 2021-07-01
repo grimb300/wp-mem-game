@@ -324,6 +324,7 @@ class MemSettings {
     // Display the page
     ?>
     <h1>Memory Game Settings</h1>
+    <p>To add the memory game to your post or page, use the shortcode <code>[memgame]</code></p>
     <form action="options.php" method="post">
       <?php
       // Output nonce, action, and option_page fields
