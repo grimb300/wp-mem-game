@@ -74,6 +74,7 @@
 }
 
 .mg-modal-wrap {
+  display: none;
   background: rgba(0, 0, 0, 0.8);
   position: absolute;
   top: 0;
@@ -90,6 +91,7 @@
 }
 
 .mg-modal {
+  display: none;
   width: 80%;
   margin: 0 auto;
   background: white;
