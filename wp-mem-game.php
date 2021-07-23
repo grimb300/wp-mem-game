@@ -24,6 +24,15 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 define( 'MEM_GAME_PATH', plugin_dir_path( __FILE__ ) );
 define( 'MEM_GAME_URL', plugin_dir_url( __FILE__ ) );
+if ( is_admin() ) {
+  if ( ! function_exists( 'get_plugin_data' ) ) {
+    require_once ABSPATH . 'wp-admin/includes/plugin.php';
+  }
+  $plugin_data = get_plugin_data( __FILE__ );
+  define( 'MEM_GAME_PLUGIN_VERSION', $plugin_data[ 'Version' ] );
+  // mem_debug( 'Plugin data:' );
+  // mem_debug( $plugin_data );
+}
 
 function mem_debug( $msg ) {
   if ( is_array( $msg ) || is_object( $msg ) || is_bool( $msg ) ) {

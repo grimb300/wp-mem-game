@@ -18,6 +18,12 @@ class MemGame {
   public function __construct() {
     // mem_debug( 'MemGame constructor' );
 
+    // Initialize the upgrade engine
+    // FIXME: Long term this should be a part of the activation flow
+    if ( is_admin() ) {
+      $this->init_upgrade();
+    }
+
     // Initialize the settings
     $this->init_settings();
 
@@ -32,6 +38,11 @@ class MemGame {
   // Run the plugin -- FIXME: Probably not needed
   public function run() {
     // mem_debug( 'MemGame run()' );
+  }
+
+  private function init_upgrade() {
+    require_once MEM_GAME_PATH . 'includes/class-mem-upgrade.php';
+    MemUpgrade::init();
   }
 
   private function init_settings() {
