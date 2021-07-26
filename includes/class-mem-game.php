@@ -18,15 +18,17 @@ class MemGame {
   public function __construct() {
     // mem_debug( 'MemGame constructor' );
 
+    // Initialize the Memory Game CPT
+    $this->init_cpt();
+    
+    // Initialize the settings
+    $this->init_settings();
+    
     // Initialize the upgrade engine
     // FIXME: Long term this should be a part of the activation flow
     if ( is_admin() ) {
       $this->init_upgrade();
     }
-
-    // Initialize the settings
-    $this->init_settings();
-
     // Create the shortcode
     $this->create_shortcode();
 
@@ -38,6 +40,11 @@ class MemGame {
   // Run the plugin -- FIXME: Probably not needed
   public function run() {
     // mem_debug( 'MemGame run()' );
+  }
+
+  private function init_cpt() {
+    require_once MEM_GAME_PATH . 'includes/class-mem-cpt.php';
+    MemCpt::init();
   }
 
   private function init_upgrade() {
