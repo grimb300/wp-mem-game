@@ -12,40 +12,40 @@ class MemSettings {
    * Properties
    * **********/
 
-  // public static $images = array(
-  //   'card_back' => array(
-  //     'title' => 'Card Back Image',
-  //     'num_imgs' => 1,
-  //     'defaults' => array(
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/social-memory.png' ),
-  //     ),
-  //   ),
-  //   'card_front' => array(
-  //     'title' => 'Card Front Images',
-  //     'num_imgs' => 12,
-  //     'defaults' => array(
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/dropbox-logo.png' ),
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/facebook-logo.png' ),
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/instagram-logo.png' ),
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/linkedin-logo.png' ),
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/pinterest-logo.png' ),
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/skype-logo.png' ),
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/snapchat-logo.png' ),
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/spotify-logo.png' ),
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/twitter-logo.png' ),
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/vimeo-logo.png' ),
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/whatsapp-logo.png' ),
-  //       array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/youtube-logo.png' ),
-  //     ),
-  //   ),
-  // );
+  public static $images = array(
+    'card_back' => array(
+      'title' => 'Card Back Image',
+      'num_imgs' => 1,
+      'defaults' => array(
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/social-memory.png' ),
+      ),
+    ),
+    'card_front' => array(
+      'title' => 'Card Front Images',
+      'num_imgs' => 12,
+      'defaults' => array(
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/dropbox-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/facebook-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/instagram-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/linkedin-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/pinterest-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/skype-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/snapchat-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/spotify-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/twitter-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/vimeo-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/whatsapp-logo.png' ),
+        array( 'id' => -1, 'fit' => 'scale-down', 'url' => MEM_GAME_URL . 'assets/images/youtube-logo.png' ),
+      ),
+    ),
+  );
 
-  // private static $default_winner_screen_options = array(
-  //   'winner_msg' => 'You Rock!',
-  //   'play_again_txt' => 'Play Again',
-  //   'quit_txt' => 'Quit',
-  //   'quit_url' => ''
-  // );
+  private static $default_winner_screen_options = array(
+    'winner_msg' => 'You Rock!',
+    'play_again_txt' => 'Play Again',
+    'quit_txt' => 'Quit',
+    'quit_url' => ''
+  );
 
   /* *******
    * Methods
@@ -99,8 +99,8 @@ class MemSettings {
      * Settings fields
      * ***************/
 
-    // Iterate across all images in MemAdmin::$images
-    foreach( MemAdmin::$images as $image_type => $info ) {
+    // Iterate across all images in self::$images
+    foreach( self::$images as $image_type => $info ) {
       add_settings_field(
         $image_type,  // ID tag of the field
         $info[ 'title' ], // Field title
@@ -358,8 +358,8 @@ class MemSettings {
         return $current_options[ $sub_option ];
       }
       // Return out of the option defaults if it exists there
-      if ( array_key_exists( $sub_option, MemAdmin::$default_winner_screen_options ) ) {
-        return MemAdmin::$default_winner_screen_options[ $sub_option ];
+      if ( array_key_exists( $sub_option, self::$default_winner_screen_options ) ) {
+        return self::$default_winner_screen_options[ $sub_option ];
       }
       // Return null if we get this far
       return null;
@@ -371,7 +371,7 @@ class MemSettings {
     }
 
     // Finally return the default array
-    return MemAdmin::$default_winner_screen_options;
+    return self::$default_winner_screen_options;
   }
 
   // Retrieve all image options
@@ -394,7 +394,7 @@ class MemSettings {
     //        This will break if/when the number of cards is ever configurable.
 
     // Grab the defaults for this image type and preload the return value
-    $return_info = MemAdmin::$images[ $image_type ][ 'defaults' ];
+    $return_info = self::$images[ $image_type ][ 'defaults' ];
 
     // If the option exists and is an array,
     // iterate across the images in the option updating the return values as needed

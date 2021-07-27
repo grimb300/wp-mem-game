@@ -31,7 +31,7 @@ class MemUpgrade {
       );
       update_option( 'mem_game_plugin_version', $current_version );
     } else {
-      mem_debug( sprintf( 'WpMemGame is up to date (version %s)', $current_version ) );
+      // mem_debug( sprintf( 'WpMemGame is up to date (version %s)', $current_version ) );
     }
   }
 }
