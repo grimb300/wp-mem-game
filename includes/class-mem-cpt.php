@@ -101,10 +101,15 @@ class MemCpt {
   }
 
   public static function render_mem_cpt_meta_box( $post ) {
-    // mem_debug( sprintf( 'Executing render_mem_cpt_meta_box for post %s', $post->ID ) );
-    // mem_debug( $post );
+    // Create the shortcode for display
+    // TODO: Create a copy to clipboard button for the shortcode(s)
+    $shortcode = '<code>[memgame id=' . $post->ID . ']</code>';
+    if ( get_post_meta( $post->ID, 'mem_game_legacy', true ) ) {
+      // Add the legacy shortcode
+      $shortcode .= ' or <code>[memgame]</code>';
+    }
     ?>
-    <p>To add the memory game to your post or page, use the shortcode <code>[memgame id=<?php echo $post->ID; ?>]</code></p>
+    <p>To add the memory game to your post or page, use the shortcode <?php echo $shortcode; ?></p>
     <h3>Card Images</h3>
     <p id="mem_game_card_images">Images for the front and back of the cards used in the memory game</p>
     <table class="form-table">

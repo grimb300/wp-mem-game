@@ -38,6 +38,20 @@ class MemShortcode {
     $memgame_id = empty( $params[ 'id' ] ) ? null : $params[ 'id' ];
 
     // TODO: If memgame_id is null, search for the legacy memgame
+    if ( null == $memgame_id ) {
+      $legacy_memgames = get_posts( array(
+        'numberposts' => 1, // Expect at most one legacy post
+        'fields' => 'ids',  // Return only the post ID
+        'post_status' => 'publish',
+        'post_type' => 'memgame',
+        'meta_key' => 'mem_game_legacy',
+        'meta_value' => 1,
+        'meta_compare' => '=',
+      ) );
+      // If a matching legacy memory game was found, update the memgame_id
+      $memgame_id = empty( $legacy_memgames ) ? null : $legacy_memgames[0];
+    }
+
 
     // Get the winner screen text out of options
     $winner_screen_info = MemCpt::get_winner_screen_options( $memgame_id );
