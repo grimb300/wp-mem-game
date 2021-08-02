@@ -89,6 +89,11 @@ class MemCpt {
     // https://core.trac.wordpress.org/ticket/18322
     $my_post = stripslashes_deep($_POST);
 
+    // Save mem_game_board_layout
+    if ( array_key_exists( 'mem_game_board_layout', $my_post) ) {
+      update_post_meta( $post_id, 'mem_game_board_layout', $my_post[ 'mem_game_board_layout' ] );
+    }
+
     // Save mem_game_images
     if ( array_key_exists( 'mem_game_images', $my_post ) ) {
       update_post_meta( $post_id, 'mem_game_images', serialize( $my_post[ 'mem_game_images' ] ) );
@@ -110,6 +115,46 @@ class MemCpt {
     }
     ?>
     <p>To add the memory game to your post or page, use the shortcode <?php echo $shortcode; ?></p>
+    <h3>Board Layout</h3>
+    <p id="mem_game_board_layout_desc">Game board dimensions in cards wide x cards high</p>
+    <table class="form-table">
+      <tbody>
+        <tr>
+          <th scope="row">Dimensions</th>
+          <td>
+            <select name="mem_game_board_layout" id="mem_game_board_layout">
+              <?php
+              $current_layout = self::get_board_layout();
+              foreach( self::$board_layout[ 'options' ] as $layout ) {
+                ?>
+                <option value="<?php echo $layout; ?>" <?php echo $layout === $current_layout ? 'selected' : ''; ?>><?php echo $layout; ?></option>
+                <?php
+              }
+              ?>
+            </select>
+          </td>
+          <td>
+            <div class="mg-wrap">
+              <div class="mg-game mg-layout-<?php echo self::get_board_layout(); ?> mg-board-layout">
+              <?php
+              // Loop across the 24 cards used in the layout
+              for ( $i = 0; $i < 24; $i += 1 ) {
+                ?>
+                <div div class="mg-card">
+                  <div class="mg-inside">
+                    <div class="mg-back">
+                    </div> <!-- .mg-back -->
+                  </div> <!-- .mg-inside -->
+                </div> <!-- .mg-card -->
+                <?php
+              }
+              ?>
+              </div> <!-- .mg-game -->
+            </div> <!-- .mg-wrap -->
+          </td>
+        </tr>
+      </tbody>
+    </table>
     <h3>Card Images</h3>
     <p id="mem_game_card_images">Images for the front and back of the cards used in the memory game</p>
     <table class="form-table">
@@ -243,6 +288,13 @@ class MemCpt {
     'quit_url' => ''
   );
 
+  // Board layout options
+  // TODO: Eventually enable layouts with different numbers of images (4x4, 6x6, 3x4, 4x3, etc)
+  private static $board_layout = array(
+    'options' => array( '6x4', '4x6' ),
+    'default' => '6x4'
+  );
+
     // Display the image picker input
   // I'm looking at a couple of tutorials to figure out how to do this:
   //   Codex page (this is probably the best resource)
@@ -264,6 +316,9 @@ class MemCpt {
     // Get WordPress' media upload URL
     $upload_link = esc_url( get_upload_iframe_src( 'image' ) );
     
+    // TODO: I'm hard coding the mg-layout- class to be 6x4,
+    //       it doesn't make as much sense here to have it change with the layout selected.
+    //       Might revisit when making the number of images variable
     ?>
     <!-- Adding some inline styles not in the frontend CSS -->
     <style>
@@ -272,13 +327,12 @@ class MemCpt {
       }
     </style>
     <div class="mg-wrap">
-      <!-- Override the default grid template with 6 columns at 100px each and a grid gap of 10px -->
-      <div class="mg-game" style="grid-template-columns: repeat(6, 100px);">
+      <div class="mg-game mg-layout-6x4 mg-img-picker">
       <?php
       // Loop across the image info associated with this option
       foreach ( $image_info as $index => $info ) {
         ?>
-        <div div class="mg-card" style="width: 100px;">
+        <div div class="mg-card">
           <div class="mg-inside">
             <div class="mg-back">
               <img class="mg-fit-<?php echo $info[ 'fit' ]; ?>" id="img-<?php echo sprintf( '%s-%d', $image_type, $index ); ?>" src="<?php echo $info[ 'url' ]; ?>" alt="Card Image">
@@ -428,6 +482,20 @@ class MemCpt {
 
     // Return the entire option array if it exists, an empty array if it doesn't
     return is_array( $current_options ) ? $current_options : array();
+  }
+
+  // Retrieve the game board layout
+  public static function get_board_layout( $memgame_id = null ) {
+    // Get the current layout out of postmeta
+    // If no memgame_id was provided, use the current post ID
+    global $post;
+    if ( null === $memgame_id ) {
+      $memgame_id = $post->ID;
+    }
+    $current_layout = get_post_meta( $memgame_id, 'mem_game_board_layout', true );
+
+    // Return the current layout if it exists, the default if it doesn't
+    return empty( $current_layout ) ? self::$board_layout[ 'default' ] : $current_layout;
   }
 
   // Get the localized data to be sent to the front end JS

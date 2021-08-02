@@ -63,4 +63,24 @@ jQuery(function ($) {
       frame.open();
     });
   });
+
+  // Not really the right place to do this for reusability, but it keeps me from adding another js file
+  // Get a handle to the board layout selector
+  console.log("Layout selector code");
+  const layoutSelector = $("#mem_game_board_layout");
+  console.log("Layout selector is");
+  console.log(layoutSelector);
+  layoutSelector.on("change", function (event) {
+    // Get a handle to the example layout
+    const boardLayoutElement = $(".mg-game.mg-board-layout");
+    // Get the current layout class
+    const currentLayoutClass = boardLayoutElement
+      .attr("class")
+      .split(" ")
+      .find((element) => element.startsWith("mg-layout-"));
+    // Construct the new layout class
+    const newLayoutClass = `mg-layout-${$(this).val()}`;
+    // Change the layout class on the mg-board-layout element
+    boardLayoutElement.removeClass(currentLayoutClass).addClass(newLayoutClass);
+  });
 });

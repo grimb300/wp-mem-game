@@ -32,8 +32,8 @@ class MemShortcode {
   // Based on this CodePen: https://codepen.io/natewiley/pen/HBrbL
   // TODO: Eventually the configuration will be in $params
   public function memgame_display( $params ) {
-    mem_debug( 'memgame_display was passed params:' );
-    mem_debug( $params );
+    // mem_debug( 'memgame_display was passed params:' );
+    // mem_debug( $params );
     // Get the 'id' attribute, if present
     $memgame_id = empty( $params[ 'id' ] ) ? null : $params[ 'id' ];
 
@@ -65,6 +65,8 @@ class MemShortcode {
     $quit_txt = $winner_screen_info[ 'quit_txt' ];
     $quit_url = $winner_screen_info[ 'quit_url' ];
 
+    // Get the game board layout
+    $game_board_layout = MemCpt::get_board_layout( $memgame_id );
 
     // Build the game layout
     $game = <<<END
@@ -78,7 +80,7 @@ class MemShortcode {
       </ol>
     </div>
     <div class="mg-wrap">
-      <div class="mg-game"></div>
+      <div class="mg-game mg-layout-$game_board_layout"></div>
       <div class="mg-modal-wrap">
         <div class="mg-modal-overlay">
           <div class="mg-modal">

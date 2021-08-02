@@ -15,8 +15,34 @@
   height: 100%;
   // Create the grid
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  // grid-template-columns: repeat(6, 1fr);
   gap: 5px;
+}
+
+// Game board layouts (default layout is 6x4)
+// Default to column width of 1fr, this works for frontend display
+.mg-game,
+.mg-game.mg-layout-6x4 {
+  grid-template-columns: repeat(6, 1fr);
+}
+.mg-game.mg-layout-4x6 {
+  grid-template-columns: repeat(4, 1fr);
+}
+// For the image picker, change the column width to 100px
+.mg-game.mg-img-picker,
+.mg-game.mg-layout-6x4.mg-img-picker {
+  grid-template-columns: repeat(6, 100px);
+}
+.mg-game.mg-layout-4x6.mg-img-picker {
+  grid-template-columns: repeat(4, 100px);
+}
+// For the layout selection, change the column width to 20px
+.mg-game.mg-board-layout,
+.mg-game.mg-layout-6x4.mg-board-layout {
+  grid-template-columns: repeat(6, 15px);
+}
+.mg-game.mg-layout-4x6.mg-board-layout {
+  grid-template-columns: repeat(4, 15px);
 }
 
 @keyframes matchAnim {
