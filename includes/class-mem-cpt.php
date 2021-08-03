@@ -23,6 +23,11 @@ class MemCpt {
     add_action( 'init', 'MemGame\MemCpt::register_mem_cpt' );
     add_action( 'admin_enqueue_scripts', 'MemGame\MemCpt::enqueue_scripts' );
     add_action( 'save_post', 'MemGame\MemCpt::save_mem_cpt_post_meta' );
+    add_filter( sprintf( 'manage_%s_posts_columns', self::$slug ), 'MemGame\MemCpt::add_cpt_custom_columns' );
+    add_action( sprintf( 'manage_%s_posts_custom_column', self::$slug ), 'MemGame\MemCpt::display_cpt_custom_column', 10, 2 );
+    add_filter( 'post_row_actions', 'MemGame\MemCpt::remove_quick_edit', 10, 2 );
+    // add_action( 'current_screen', 'MemGame\MemCpt::current_screen' );
+    add_filter( sprintf( 'bulk_actions-edit-%s', self::$slug ), 'MemGame\MemCpt::remove_edit_bulk_action' );
   }
 
   public static function register_mem_cpt() {
@@ -105,16 +110,20 @@ class MemCpt {
     }
   }
 
-  public static function render_mem_cpt_meta_box( $post ) {
-    // Create the shortcode for display
+  // Create the shortcode for display
+  private static function display_shortcode( $memgame_id = null ) {
     // TODO: Create a copy to clipboard button for the shortcode(s)
-    $shortcode = '<code>[memgame id=' . $post->ID . ']</code>';
-    if ( get_post_meta( $post->ID, 'mem_game_legacy', true ) ) {
+    $shortcode = '<code>[memgame id=' . $memgame_id . ']</code>';
+    if ( get_post_meta( $memgame_id, 'mem_game_legacy', true ) ) {
       // Add the legacy shortcode
       $shortcode .= ' or <code>[memgame]</code>';
     }
+    return $shortcode;
+  }
+
+  public static function render_mem_cpt_meta_box( $post ) {
     ?>
-    <p>To add the memory game to your post or page, use the shortcode <?php echo $shortcode; ?></p>
+    <p>To add the memory game to your post or page, use the shortcode <?php echo self::display_shortcode( $post->ID ); ?></p>
     <h3>Board Layout</h3>
     <p id="mem_game_board_layout_desc">Game board dimensions in cards wide x cards high</p>
     <table class="form-table">
@@ -537,5 +546,68 @@ class MemCpt {
 
     // Return the data
     return $return_data;
+  }
+
+  // Add columns to the memgame list
+  public static function add_cpt_custom_columns( $old_columns ) {
+    // Add columns for shortcode and board layout
+    $columns = array(
+      'cb' => $old_columns[ 'cb' ],
+      'title' => 'Game Description',
+      'shortcode' => 'Shortcode',
+      'layout' => 'Board Layout',
+      'date' => 'Date'
+    );
+    return $columns;
+  }
+  
+  // Display the new columns
+  public static function display_cpt_custom_column( $column, $post_id ) {
+    // Display the shortcode
+    if ( 'shortcode' === $column ) {
+     echo self::display_shortcode( $post_id );
+    }
+
+    // Display the board layout
+    if ( 'layout' === $column ) {
+      echo self::get_board_layout( $post_id );
+    }
+  }
+
+  // Remove 'Quick Edit' from the post row actions
+  public static function remove_quick_edit( $old_actions, $post ) {
+    if ( self::$slug === $post->post_type ) {
+      // Make a copy, filtering out the 'inline hide-if-no-js' element (this is 'Quick Edit')
+      $new_actions = array();
+      foreach( array_keys( $old_actions ) as $key ) {
+        if ( 'inline hide-if-no-js' !== $key ) {
+          $new_actions[ $key ] = $old_actions[ $key ];
+        }
+      }
+      // Return the filtered actions
+      return $new_actions;
+    }
+    // Return the original list of actions
+    return $old_actions;
+  }
+
+  // Actions to be performed on the current screen
+  // Found this gem here: https://wordpress.org/support/topic/disable-quick-edit/
+  // Only used to figure out the screen id to filter the 'Edit' bulk action
+  // public static function current_screen( $screen ) {
+  //   if ( empty( $screen->id ) ) return;
+  //   mem_debug( 'My screen id is ' . $screen->id );
+  // }
+
+  // Filter out the 'Edit' bulk action
+  public static function remove_edit_bulk_action( $old_actions ) {
+    // Make a copy, filtering out the 'edit' element
+    $new_actions = array();
+    foreach( array_keys( $old_actions ) as $key ) {
+      if ( 'edit' !== $key ) {
+        $new_actions[ $key ] = $old_actions[ $key ];
+      }
+    }
+    return $new_actions;
   }
 }
