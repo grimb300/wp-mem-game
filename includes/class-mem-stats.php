@@ -13,7 +13,7 @@ class MemStats {
    * **********/
 
   // Stats table version
-  private static $version = 'v1';
+  private static $version = 'v2';
   private static $table_name = 'mem_game_stats';
 
   // Game data fields
@@ -37,7 +37,8 @@ class MemStats {
     // Initialize the AJAX interface
     self::init_ajax();
 
-    // Add the function to catch the download_stats request
+    // Add the function to catch the download_stats and clear_stats requests
+    add_action( 'admin_init', 'MemGame\MemStats::clear_stats' );
     add_action( 'admin_init', 'MemGame\MemStats::download_stats' );
 
     // Get the version stored in settings
@@ -67,6 +68,8 @@ class MemStats {
     $sql = "CREATE TABLE $full_table_name (
       id mediumint(9) NOT NULL AUTO_INCREMENT,
       session_start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      memgame_id mediumint(9) DEFAULT 0 NOT NULL,
+      post_id mediumint(9) DEFAULT 0 NOT NULL,
       nonce VARCHAR(10) DEFAULT '' NOT NULL,
       game_data VARCHAR(1500) DEFAULT '' NOT NULL,
       PRIMARY KEY (id)
@@ -109,8 +112,10 @@ class MemStats {
       'abandoned' => false
     );
 
-    // Get the session_id out of the post array, if present
+    // Get the session_id, memgame_id, and post_id out of the post array, if present
     $session_id = empty( $_POST[ 'data' ][ 'session_id' ] ) ? -1 : intval( $_POST[ 'data' ][ 'session_id' ] );
+    $memgame_id = empty( $_POST[ 'data' ][ 'memgame_id' ] ) ? -1 : intval( $_POST[ 'data' ][ 'memgame_id' ] );
+    $post_id = empty( $_POST[ 'data' ][ 'post_id' ] ) ? -1 : intval( $_POST[ 'data' ][ 'post_id' ] );
 
     // Get the session out of the database table
     $session = $wpdb->get_results( "SELECT * FROM `$full_table_name` WHERE id = $session_id;", ARRAY_A );
@@ -123,7 +128,9 @@ class MemStats {
         $full_table_name,
         array(
           'nonce' => $_POST[ '_ajax_nonce' ],
-          'game_data' => self::pack_game_data( array( $new_game ) )
+          'game_data' => self::pack_game_data( array( $new_game ) ),
+          'memgame_id' => $memgame_id,
+          'post_id' => $post_id
         )
       );
       $session_id = $wpdb->insert_id;
@@ -419,12 +426,12 @@ class MemStats {
   public static function get_analyzed_stats() {
     global $wpdb;
     $full_table_name = $wpdb->prefix . self::$table_name;
-    $sessions = $wpdb->get_results( "SELECT * FROM `$full_table_name`;", ARRAY_A );
-    $analyzed_sessions = self::analyze_sessions( $sessions );
+    $raw_sessions = $wpdb->get_results( "SELECT * FROM `$full_table_name`;", ARRAY_A );
+    $analyzed_sessions = self::analyze_sessions( $raw_sessions );
     
     $totals = self::compute_totals( $analyzed_sessions );
 
-    $num_sessions = sizeof( $sessions );
+    $num_sessions = sizeof( $raw_sessions );
     if ( 0 === $num_sessions ) {
       $avg_completed_per_session = 0;
       $avg_seconds_per_session = 0;
@@ -472,17 +479,10 @@ class MemStats {
   }
 
   public static function display_stats_page() {
-    // If we're clearing the stats, do that first
-    $msg = '';
-    if ( isset( $_GET[ 'clear_stats' ] ) ) {
-      $msg = 'User Statistics Cleared';
-      self::create_stats_table();
-    }
-
-    // Take the current URI and strip out any potential clear_stats or download_stats parameters
-    $stripped_uri = preg_replace( '/&(clear|download)_stats=1/', '', $_SERVER[ 'REQUEST_URI' ] );
-    $clear_stats_uri = $stripped_uri . '&clear_stats=1';
-    $download_stats_uri = $stripped_uri . '&download_stats=1';
+    // Create the clear/download stats URIs based on the current URI
+    // add_query_arg with only a key/value pair adds the new arg to the existing $_SERVER['REQUEST_URI']
+    $clear_stats_uri = add_query_arg( 'clear_stats', '1' );
+    $download_stats_uri = add_query_arg( 'download_stats', '1' );
 
     ?>
     <div class="wrap">
@@ -501,20 +501,42 @@ class MemStats {
     <?php
   }
 
+  public static function clear_stats() {
+    // Test if this is a clear_stats request
+    $is_clear_stats_request =
+      isset( $_GET[ 'post_type' ] ) && 'memgame' === $_GET[ 'post_type' ] &&
+      isset( $_GET[ 'page' ] ) && 'mem-game-stats' === $_GET[ 'page' ] &&
+      isset( $_GET[ 'clear_stats' ] );
+
+    if ( $is_clear_stats_request ) {
+      // Create the stats table which will drop the old table first
+      self::create_stats_table();
+      
+      // Redirect without the clear_stats parameter
+      global $wp;
+      $request_uri = site_url( $_SERVER[ 'REQUEST_URI' ] );
+      $cleaned_uri = remove_query_arg( 'clear_stats', $request_uri );
+      wp_redirect( $cleaned_uri, 302 );
+
+      // Die, so the requested page isn't displayed
+      die();
+    }
+  }
+
   public static function download_stats() {
     global $wpdb;
     $full_table_name = $wpdb->prefix . self::$table_name;
 
-    if (
-      isset( $_GET[ 'post_type' ] ) &&
-      'memgame' === $_GET[ 'post_type' ] &&
-      isset( $_GET[ 'page' ] ) &&
-      'mem-game-stats' === $_GET[ 'page' ] &&
-      isset( $_GET[ 'download_stats' ] )
-    ) {
+    // Test if this is a download_stats request
+    $is_download_stats_request =
+      isset( $_GET[ 'post_type' ] ) && 'memgame' === $_GET[ 'post_type' ] &&
+      isset( $_GET[ 'page' ] ) && 'mem-game-stats' === $_GET[ 'page' ] &&
+      isset( $_GET[ 'download_stats' ] );
+
+    if ( $is_download_stats_request ) {
       // Get the stats out of the database
-      $sessions = $wpdb->get_results( "SELECT * FROM `$full_table_name`;", ARRAY_A );
-      $analyzed_sessions = self::analyze_sessions( $sessions );
+      $raw_sessions = $wpdb->get_results( "SELECT * FROM `$full_table_name`;", ARRAY_A );
+      $analyzed_sessions = self::analyze_sessions( $raw_sessions );
 
       // Set the headers to download the csv file
       header('Content-Type: text/csv');
@@ -530,6 +552,8 @@ class MemStats {
       // Output the header row
       fputcsv( $csv_stream, array(
         'Session ID',
+        'Memory Game ID',
+        'Post ID',
         'Number Completed Games',
         'Completed Games Total Seconds',
         'Completed Games Max Seconds',
@@ -545,9 +569,11 @@ class MemStats {
         'Abandoned Games Max Clicks',
         'Abandoned Games Min Clicks',
       ) );
-      foreach( $analyzed_sessions as $session_id => $session ) {
+      foreach( $analyzed_sessions as $index => $session ) {
         fputcsv( $csv_stream, array(
-          $session_id,
+          $raw_sessions[ $index ][ 'id' ],
+          $raw_sessions[ $index ][ 'memgame_id' ],
+          $raw_sessions[ $index ][ 'post_id' ],
           $session[ 'completed' ][ 'games' ],
           $session[ 'completed' ][ 'total_seconds' ],
           $session[ 'completed' ][ 'max_seconds' ],
@@ -566,7 +592,7 @@ class MemStats {
       }
       fclose( $csv_stream );
   
-      die;
+      die();
     }
   }
 }

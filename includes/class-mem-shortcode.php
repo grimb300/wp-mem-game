@@ -32,8 +32,10 @@ class MemShortcode {
   // Based on this CodePen: https://codepen.io/natewiley/pen/HBrbL
   // TODO: Eventually the configuration will be in $params
   public function memgame_display( $params ) {
-    // mem_debug( 'memgame_display was passed params:' );
-    // mem_debug( $params );
+    // Get the post ID
+    global $post;
+    $post_id = $post->ID;
+
     // Get the 'id' attribute, if present
     $memgame_id = empty( $params[ 'id' ] ) ? null : $params[ 'id' ];
 
@@ -95,7 +97,7 @@ class MemShortcode {
 
     // Enqueue the necessary JS and CSS
     self::enqueue_memgame_css();
-    self::enqueue_memgame_js( $memgame_id );
+    self::enqueue_memgame_js( $memgame_id, $post_id );
 
     return $game;
   }
@@ -108,7 +110,7 @@ class MemShortcode {
     wp_enqueue_style( 'mem_game_css' );
   }
 
-  public static function enqueue_memgame_js( $memgame_id = null ) {
+  public static function enqueue_memgame_js( $memgame_id = null, $post_id = null ) {
     // Pass image info to the JS as localized data
     wp_localize_script(
       'mem_game_js',
@@ -116,7 +118,9 @@ class MemShortcode {
       array(
         'images' => MemCpt::get_localized_image_data( $memgame_id ),
         'ajax_url' => admin_url( 'admin-ajax.php' ),
-        'nonce' => wp_create_nonce( 'mem_game_stats' )
+        'nonce' => wp_create_nonce( 'mem_game_stats' ),
+        'memgame_id' => $memgame_id,
+        'post_id' => $post_id
       )
     );
     // Enqueue the files (already registered)

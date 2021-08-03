@@ -35,7 +35,11 @@
         data: {
           action: "mem_game_start",
           _ajax_nonce: mem_game_img_obj.nonce,
-          data: { session_id: currentSessionID },
+          data: {
+            session_id: currentSessionID,
+            memgame_id: mem_game_img_obj.memgame_id,
+            post_id: mem_game_img_obj.post_id,
+          },
         },
         success: function (response) {
           console.log("The response:");
@@ -72,6 +76,8 @@
         _ajax_nonce: mem_game_img_obj.nonce,
         data: {
           session_id: currentSessionID,
+          memgame_id: mem_game_img_obj.memgame_id,
+          post_id: mem_game_img_obj.post_id,
           num_clicks: collectedClicks,
         },
       },
@@ -111,6 +117,8 @@
         _ajax_nonce: mem_game_img_obj.nonce,
         data: {
           session_id: currentSessionID,
+          memgame_id: mem_game_img_obj.memgame_id,
+          post_id: mem_game_img_obj.post_id,
           num_clicks: collectedClicks,
         },
       },
