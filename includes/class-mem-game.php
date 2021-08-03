@@ -22,7 +22,8 @@ class MemGame {
     $this->init_cpt();
     
     // Initialize the settings
-    $this->init_settings();
+    // Removed the settings page after switching to CPT
+    // $this->init_settings();
     
     // Initialize the upgrade engine
     // FIXME: Long term this should be a part of the activation flow

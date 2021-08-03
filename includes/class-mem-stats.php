@@ -37,32 +37,42 @@ class MemStats {
     // Initialize the AJAX interface
     self::init_ajax();
 
-    // Database related stuff
-    global $wpdb;
+    // Add the function to catch the download_stats request
+    add_action( 'admin_init', 'MemGame\MemStats::download_stats' );
 
     // Get the version stored in settings
     $current_version = get_option( 'mem_game_stats_version' );
     if ( $current_version !== self::$version ) {
-      $full_table_name = $wpdb->prefix . self::$table_name;
-
-      // For now, don't mess with updating, just drop the table
-      $wpdb->query( "DROP TABLE IF EXISTS $full_table_name" );
-
-      // Now create a new table
-      $charset_collage = $wpdb->get_charset_collate();
-      $sql = "CREATE TABLE $full_table_name (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        session_start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        nonce VARCHAR(10) DEFAULT '' NOT NULL,
-        game_data VARCHAR(1500) DEFAULT '' NOT NULL,
-        PRIMARY KEY (id)
-      ) $charset_collate;";
-      require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-      dbDelta( $sql );
-
+      // Create the table (deletes the old one if it exists)
+      self::create_stats_table();
       // Update the current version
       update_option( 'mem_game_stats_version', self::$version );
     }
+
+    // Register the admin page to display the stats
+    add_action( 'admin_menu', 'MemGame\MemStats::register_stats_page' );
+  }
+
+  private static function create_stats_table() {
+    global $wpdb;
+
+    // Compose the table name
+    $full_table_name = $wpdb->prefix . self::$table_name;
+
+    // For now, don't mess with updating, just drop the table
+    $wpdb->query( "DROP TABLE IF EXISTS $full_table_name" );
+
+    // Now create a new table
+    $charset_collate = $wpdb->get_charset_collate();
+    $sql = "CREATE TABLE $full_table_name (
+      id mediumint(9) NOT NULL AUTO_INCREMENT,
+      session_start_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      nonce VARCHAR(10) DEFAULT '' NOT NULL,
+      game_data VARCHAR(1500) DEFAULT '' NOT NULL,
+      PRIMARY KEY (id)
+    ) $charset_collate;";
+    require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+    dbDelta( $sql );
   }
 
   /**
@@ -280,12 +290,8 @@ class MemStats {
     return $unpacked_array;
   }
 
-  // Analyze the stats
-  // This is echoed out, currently only used in MemStats
-  public static function get_analyzed_stats() {
-    global $wpdb;
-    $full_table_name = $wpdb->prefix . self::$table_name;
-    $sessions = $wpdb->get_results( "SELECT * FROM `$full_table_name`;", ARRAY_A );
+  // Convert the raw session data stored in the custom table into an array of sessions
+  private static function analyze_sessions( $raw_data = array() ) {
     $analyzed_sessions = array_map( function( $session ) {
       $game_data = self::unpack_game_data( $session[ 'game_data' ] );
       return array_reduce(
@@ -347,11 +353,13 @@ class MemStats {
           )
         )
       );
-    }, $sessions );
+    }, $raw_data );
 
-    // mem_debug( 'Analyzed sessions' );
-    // mem_debug( $analyzed_sessions );
+    return $analyzed_sessions;
+  }
 
+  // Take the analyzed sessions and return the totals for all sessions
+  private static function compute_totals( $analyzed_sessions = array() ) {
     $totals = array_reduce(
       $analyzed_sessions,
       function( $t, $s ) {
@@ -403,12 +411,36 @@ class MemStats {
       )
     );
 
+    return $totals;
+  }
+
+  // Analyze the stats
+  // This is echoed out, currently only used in MemStats
+  public static function get_analyzed_stats() {
+    global $wpdb;
+    $full_table_name = $wpdb->prefix . self::$table_name;
+    $sessions = $wpdb->get_results( "SELECT * FROM `$full_table_name`;", ARRAY_A );
+    $analyzed_sessions = self::analyze_sessions( $sessions );
+    
+    $totals = self::compute_totals( $analyzed_sessions );
+
     $num_sessions = sizeof( $sessions );
-    $avg_completed_per_session = $totals[ 'completed' ] / $num_sessions;
-    $avg_seconds_per_session = $totals[ 'seconds' ] / $num_sessions;
-    $avg_clicks_per_session = $totals[ 'clicks' ] / $num_sessions;
-    $avg_seconds_per_never_completed = $totals[ 'never_completed_seconds' ] / $totals[ 'never_completed' ];
-    $avg_clicks_per_never_completed = $totals[ 'never_completed_clicks' ] / $totals[ 'never_completed' ];
+    if ( 0 === $num_sessions ) {
+      $avg_completed_per_session = 0;
+      $avg_seconds_per_session = 0;
+      $avg_clicks_per_session = 0;
+    } else {
+      $avg_completed_per_session = $totals[ 'completed' ] / $num_sessions;
+      $avg_seconds_per_session = $totals[ 'seconds' ] / $num_sessions;
+      $avg_clicks_per_session = $totals[ 'clicks' ] / $num_sessions;
+    }
+    if ( 0 === $totals[ 'never_completed' ] ) {
+      $avg_seconds_per_never_completed = 0;
+      $avg_clicks_per_never_completed = 0;
+    } else {
+      $avg_seconds_per_never_completed = $totals[ 'never_completed_seconds' ] / $totals[ 'never_completed' ];
+      $avg_clicks_per_never_completed = $totals[ 'never_completed_clicks' ] / $totals[ 'never_completed' ];
+    }
 
     // Display the stats
     // TODO: Add raw data display? Add reset stats button?
@@ -425,5 +457,116 @@ class MemStats {
       <p><strong><?php echo $totals[ 'never_completed' ]; ?></strong> sessions never completed a single game and lasted on average for <strong><?php echo sprintf( '%.1f', $avg_seconds_per_never_completed ); ?></strong> seconds (<strong><?php echo sprintf( '%.1f', $avg_clicks_per_never_completed ); ?></strong> clicks).</p>
     </div>
     <?php
+  }
+
+  public static function register_stats_page() {
+    add_submenu_page(
+      'edit.php?post_type=memgame',
+      'Memory Game User Statistics',
+      'User Stats',
+      'edit_posts',
+      'mem-game-stats',
+      'MemGame\MemStats::display_stats_page',
+      100
+    );
+  }
+
+  public static function display_stats_page() {
+    // If we're clearing the stats, do that first
+    $msg = '';
+    if ( isset( $_GET[ 'clear_stats' ] ) ) {
+      $msg = 'User Statistics Cleared';
+      self::create_stats_table();
+    }
+
+    // Take the current URI and strip out any potential clear_stats or download_stats parameters
+    $stripped_uri = preg_replace( '/&(clear|download)_stats=1/', '', $_SERVER[ 'REQUEST_URI' ] );
+    $clear_stats_uri = $stripped_uri . '&clear_stats=1';
+    $download_stats_uri = $stripped_uri . '&download_stats=1';
+
+    ?>
+    <div class="wrap">
+      <h1 class="wp-heading-inline">Memory Game Statistics</h1>
+      <?php $stats = self::get_analyzed_stats(); ?>
+      <?php
+      if ( ! empty( $msg ) ) {
+        ?>
+        <p><em><?php echo $msg; ?></em></p>
+        <?php
+      }
+      ?>
+      <a class="button button-secondary" href="<?php echo $clear_stats_uri; ?>">Clear Statistics</a>
+      <a class="button button-primary" href="<?php echo $download_stats_uri; ?>">Download Statistics</a>
+    </div>
+    <?php
+  }
+
+  public static function download_stats() {
+    global $wpdb;
+    $full_table_name = $wpdb->prefix . self::$table_name;
+
+    if (
+      isset( $_GET[ 'post_type' ] ) &&
+      'memgame' === $_GET[ 'post_type' ] &&
+      isset( $_GET[ 'page' ] ) &&
+      'mem-game-stats' === $_GET[ 'page' ] &&
+      isset( $_GET[ 'download_stats' ] )
+    ) {
+      // Get the stats out of the database
+      $sessions = $wpdb->get_results( "SELECT * FROM `$full_table_name`;", ARRAY_A );
+      $analyzed_sessions = self::analyze_sessions( $sessions );
+
+      // Set the headers to download the csv file
+      header('Content-Type: text/csv');
+      header('Content-Disposition: attachment;filename="user_stats.csv"');
+      header('Cache-Control: max-age=0');
+      header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
+      header ('Cache-Control: cache, must-revalidate'); // HTTP/1.1
+      header ('Pragma: public'); // HTTP/1.0
+      
+      // TODO: Could turn this into a series of class params
+      // Open the output stream
+      $csv_stream = fopen( 'php://output', 'w' );
+      // Output the header row
+      fputcsv( $csv_stream, array(
+        'Session ID',
+        'Number Completed Games',
+        'Completed Games Total Seconds',
+        'Completed Games Max Seconds',
+        'Completed Games Min Seconds',
+        'Completed Games Total Clicks',
+        'Completed Games Max Clicks',
+        'Completed Games Min Clicks',
+        'Number Abandoned Games',
+        'Abandoned Games Total Seconds',
+        'Abandoned Games Max Seconds',
+        'Abandoned Games Min Seconds',
+        'Abandoned Games Total Clicks',
+        'Abandoned Games Max Clicks',
+        'Abandoned Games Min Clicks',
+      ) );
+      foreach( $analyzed_sessions as $session_id => $session ) {
+        fputcsv( $csv_stream, array(
+          $session_id,
+          $session[ 'completed' ][ 'games' ],
+          $session[ 'completed' ][ 'total_seconds' ],
+          $session[ 'completed' ][ 'max_seconds' ],
+          $session[ 'completed' ][ 'min_seconds' ],
+          $session[ 'completed' ][ 'total_clicks' ],
+          $session[ 'completed' ][ 'max_clicks' ],
+          $session[ 'completed' ][ 'min_clicks' ],
+          $session[ 'abandoned' ][ 'games' ],
+          $session[ 'abandoned' ][ 'total_seconds' ],
+          $session[ 'abandoned' ][ 'max_seconds' ],
+          $session[ 'abandoned' ][ 'min_seconds' ],
+          $session[ 'abandoned' ][ 'total_clicks' ],
+          $session[ 'abandoned' ][ 'max_clicks' ],
+          $session[ 'abandoned' ][ 'min_clicks' ],
+      ) );
+      }
+      fclose( $csv_stream );
+  
+      die;
+    }
   }
 }
