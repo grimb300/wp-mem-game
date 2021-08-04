@@ -56,7 +56,7 @@ class MemShortcode {
 
 
     // Get the winner screen text out of options
-    $winner_screen_info = MemCpt::get_winner_screen_options( $memgame_id );
+    $winner_screen_info = MemCpt::get_winner_screen( $memgame_id );
     // If the memory game wasn't found, return an error
     if ( empty( $winner_screen_info ) ) {
       return '<h5>No matching Memory Game found.</h5>';
@@ -116,7 +116,7 @@ class MemShortcode {
       'mem_game_js',
       'mem_game_img_obj',
       array(
-        'images' => MemCpt::get_localized_image_data( $memgame_id ),
+        'images' => MemCpt::get_images_for_localize_script( $memgame_id ),
         'ajax_url' => admin_url( 'admin-ajax.php' ),
         'nonce' => wp_create_nonce( 'mem_game_stats' ),
         'memgame_id' => $memgame_id,

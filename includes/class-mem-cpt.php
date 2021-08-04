@@ -34,7 +34,6 @@ class MemCpt {
     $cpt_labels = array(
       'name' => self::$plural_name,
       'singular_name' => self::$singular_name,
-      //add_new – Default is ‘Add New’ for both hierarchical and non-hierarchical types. When internationalizing this string, please use a gettext context matching your post type. Example: _x( 'Add New', 'product', 'textdomain' );.
       'add_new_item' => sprintf( 'Add New %s', self::$singular_name ),
       'edit_item' => sprintf( 'Edit %s', self::$singular_name ),
       'new_item' => sprintf( 'New %s', self::$singular_name ),
@@ -44,18 +43,6 @@ class MemCpt {
       'not_found' => sprintf( 'No %s found', self::$plural_name ),
       'not_found_in_trash' => sprintf( 'No %s found in Trash', self::$plural_name ),
       'all_items' => sprintf( 'All %s', self::$plural_name ),
-      // menu_name – Label for the menu name. Default is the same as name.
-      // filter_items_list – Label for the table views hidden heading. Default is ‘Filter posts list’ / ‘Filter pages list’.
-      // filter_by_date – Label for the date filter in list tables. Default is ‘Filter by date’.
-      // items_list_navigation – Label for the table pagination hidden heading. Default is ‘Posts list navigation’ / ‘Pages list navigation’.
-      // items_list – Label for the table hidden heading. Default is ‘Posts list’ / ‘Pages list’.
-      // item_published – Label used when an item is published. Default is ‘Post published.’ / ‘Page published.’
-      // item_published_privately – Label used when an item is published with private visibility. Default is ‘Post published privately.’ / ‘Page published privately.’
-      // item_reverted_to_draft – Label used when an item is switched to a draft. Default is ‘Post reverted to draft.’ / ‘Page reverted to draft.’
-      // item_scheduled – Label used when an item is scheduled for publishing. Default is ‘Post scheduled.’ / ‘Page scheduled.’
-      // item_updated – Label used when an item is updated. Default is ‘Post updated.’ / ‘Page updated.’
-      // item_link – Title for a navigation link block variation. Default is ‘Post Link’ / ‘Page Link’.
-      // item_link_description – Description for a navigation link block variation. Default is ‘A link to a post.’ / ‘A link to a page.’
     );
     $cpt_args = array(
       'labels' => $cpt_labels,
@@ -66,11 +53,8 @@ class MemCpt {
       'show_in_rest' => false,
       'menu_position' => 30, // Position (30 puts it after the "Comments" menu item)
       'menu_icon' => self::$icon,
-      // 'capability_type' - The string to use to build the read, edit, and delete capabilities. May be passed as an array to allow for alternative plurals when using this argument as a base to construct the capabilities, e.g. array('story', 'stories'). Default 'post'.
-      // 'capabilities' - Array of capabilities for this post type. $capability_type is used as a base to construct capabilities by default. See get_post_type_capabilities().
       'supports' => array( 'title' ),
       'register_meta_box_cb' => 'MemGame\MemCpt::display_mem_cpt_meta_box',
-      // 'has_archive' - Whether there should be post type archives, or if a string, the archive slug to use. Will generate the proper rewrite rules if $rewrite is enabled. Default false.
       'rewrite' => false,
     );
 
@@ -132,19 +116,15 @@ class MemCpt {
           <th scope="row">Dimensions</th>
           <td>
             <select name="mem_game_board_layout" id="mem_game_board_layout">
-              <?php
-              $current_layout = self::get_board_layout();
-              foreach( self::$board_layout[ 'options' ] as $layout ) {
-                ?>
+              <?php $current_layout = self::get_board_layout( $post->ID ); ?>
+              <?php foreach( self::$default_board_layout_info[ 'options' ] as $layout ) { ?>
                 <option value="<?php echo $layout; ?>" <?php echo $layout === $current_layout ? 'selected' : ''; ?>><?php echo $layout; ?></option>
-                <?php
-              }
-              ?>
+              <?php } ?>
             </select>
           </td>
           <td>
             <div class="mg-wrap">
-              <div class="mg-game mg-layout-<?php echo self::get_board_layout(); ?> mg-board-layout">
+              <div class="mg-game mg-layout-<?php echo $current_layout; ?> mg-board-layout">
               <?php
               // Loop across the 24 cards used in the layout
               for ( $i = 0; $i < 24; $i += 1 ) {
@@ -168,17 +148,11 @@ class MemCpt {
     <p id="mem_game_card_images">Images for the front and back of the cards used in the memory game</p>
     <table class="form-table">
       <tbody>
-        <?php foreach( self::$images as $image_type => $info ) { ?>
+        <?php foreach( self::get_images( $post->ID ) as $image_type => $image_type_data ) { ?>
         <tr>
-          <th scope="row"><?php echo $info[ 'title' ]; ?></th>
+          <th scope="row"><?php echo self::get_image_type_title( $image_type ); ?></th>
           <td>
-            <?php
-            self::display_image_input(
-              array(
-                'label_for' => $image_type,
-              )
-            );
-            ?>
+            <?php self::display_image_input( $image_type, $image_type_data ); ?>
           </td>
         </tr>
         <?php } ?>
@@ -188,62 +162,17 @@ class MemCpt {
     <p id="mem_game_winner_screen">Text and buttons displayed on the "winner screen" of the memory game</p>
     <table class="form-table">
       <tbody>
+        <?php foreach( self::get_winner_screen( $post->ID ) as $field => $data ) { ?>
         <tr>
-          <th scope="row">Winner Message</th>
+          <th scope="row"><?php echo self::get_winner_screen_title( $field ); ?></th>
           <td>
             <?php
-            self::display_winner_screen_input(
-              array(
-                'label_for' => 'winner_msg',
-                'parent_option' => 'mem_game_winner_screen',
-                'input_type' => 'text',
-              )
-            );
+            $input_type = self::get_winner_screen_input_type( $field );
+            self::display_winner_screen_input( $field, $input_type, $data );
             ?>
           </td>
         </tr>
-        <tr>
-          <th scope="row">Play Again Button Text</th>
-          <td>
-            <?php
-            self::display_winner_screen_input(
-              array(
-                'label_for' => 'play_again_txt',
-                'parent_option' => 'mem_game_winner_screen',
-                'input_type' => 'text',
-              )
-            );
-            ?>
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">Quit Button Text</th>
-          <td>
-            <?php
-            self::display_winner_screen_input(
-              array(
-                'label_for' => 'quit_txt',
-                'parent_option' => 'mem_game_winner_screen',
-                'input_type' => 'text',
-              )
-            );
-            ?>
-          </td>
-        </tr>
-        <tr>
-          <th scope="row">Quit Button Link URL</th>
-          <td>
-            <?php
-            self::display_winner_screen_input(
-              array(
-                'label_for' => 'quit_url',
-                'parent_option' => 'mem_game_winner_screen',
-                'input_type' => 'url',
-              )
-            );
-            ?>
-          </td>
-        </tr>
+        <?php } ?>
       </tbody>
     </table>
     <?php
@@ -261,7 +190,7 @@ class MemCpt {
    */
 
   // Image data structure and defaults
-  private static $images = array(
+  private static $default_images_info = array(
     'card_back' => array(
       'title' => 'Card Back Image',
       'num_imgs' => 1,
@@ -290,16 +219,32 @@ class MemCpt {
   );
 
   // Winner screen data structure and defaults
-  private static $default_winner_screen_options = array(
-    'winner_msg' => 'You Rock!',
-    'play_again_txt' => 'Play Again',
-    'quit_txt' => 'Quit',
-    'quit_url' => ''
+  private static $default_winner_screen_info = array(
+    'winner_msg' => array(
+      'title' => 'Winner Message',
+      'input_type' => 'text',
+      'default' => 'You Rock!',
+    ),
+    'play_again_txt' => array(
+      'title' => 'Play Again Button Text',
+      'input_type' => 'text',
+      'default' => 'Play Again',
+    ),
+    'quit_txt' => array(
+      'title' => 'Quit Button Text',
+      'input_type' => 'text',
+      'default' => 'Quit',
+    ),
+    'quit_url' => array(
+      'title' => 'Quit Button Link URL',
+      'input_type' => 'url',
+      'default' => '',
+    ),
   );
 
   // Board layout options
   // TODO: Eventually enable layouts with different numbers of images (4x4, 6x6, 3x4, 4x3, etc)
-  private static $board_layout = array(
+  private static $default_board_layout_info = array(
     'options' => array( '6x4', '4x6' ),
     'default' => '6x4'
   );
@@ -310,13 +255,7 @@ class MemCpt {
   //     https://codex.wordpress.org/Javascript_Reference/wp.media
   //   Random tutorial (looks like it may be a little old)
   //     https://jeroensormani.com/how-to-include-the-wordpress-media-selector-in-your-plugin/
-  public static function display_image_input( $args ) {
-    global $post;
-    // Get the info for the image type to be displayed
-    $image_type = $args[ 'label_for' ];
-    $post_id = $post->ID;
-    $image_info = self::get_image_type_info( $image_type );
-
+  public static function display_image_input( $image_type, $image_info ) {
     /***************************************************
      * Display the media picker
      * Based loosely on the WordPress Codex (link above)
@@ -359,8 +298,6 @@ class MemCpt {
               <?php _e('Update'); ?>
             </a>
           </div>
-          <!-- <p class="hide-if-no-js">
-          </p> -->
           <input class="custom-img-id" name="mem_game_images[<?php echo $image_type; ?>][<?php echo $index; ?>][id]" type="hidden" value="<?php echo esc_attr( $info[ 'id' ] ); ?>" />
         </div> <!-- .mg-card -->
         <?php
@@ -371,62 +308,90 @@ class MemCpt {
     <?php
   }
 
-  // Retrieve all image options
-  // Deviating from class-mem-settings.php here.
-  // Pass an optional memgame_id to the function. If memgame_id is null, use the current post ID
-  private static function get_image_option( $memgame_id = null ) {
-    global $post;
-    if ( null === $memgame_id ) {
-      $memgame_id = $post->ID;
+  /* ****************************
+   * New image accessor functions
+   * ****************************/
+
+  // Get the image defaults out of default_images_info
+  private static function get_image_defaults() {
+    $image_defaults = array();
+    foreach( self::$default_images_info as $image_type => $image_info ) {
+      $image_defaults[ $image_type ] = $image_info[ 'defaults' ];
     }
-    $image_data = unserialize( get_post_meta( $memgame_id, 'mem_game_images', true ) );
-    return is_array( $image_data ) ? $image_data : array();
+    return $image_defaults;
   }
 
-  // Retrieve options for a particular image type
-  // Deviating from class-mem-settings.php here.
-  // Pass an optional memgame_id to the function that gets passed to the next level.
-  private static function get_image_type_option( $image_type, $memgame_id = null ) {
-    $all_options = self::get_image_option( $memgame_id );
-    return array_key_exists( $image_type, $all_options ) ? $all_options[ $image_type ] : array();
+  // Get the image type title for display on the edit screen
+  private static function get_image_type_title( $image_type ) {
+    return self::$default_images_info[ $image_type ][ 'title' ];
   }
 
-  // Get the info for a given image type
-  // Deviating from class-mem-settings.php here.
-  // Pass an optional memgame_id to the function that gets passed to the next level.
-  private static function get_image_type_info( $image_type, $memgame_id = null ) {
-    $image_type_option = self::get_image_type_option( $image_type, $memgame_id );
-    
-    // FIXME: Using the "defaults" defined above as the golden copy of how many images of each type there are.
-    //        This will break if/when the number of cards is ever configurable.
-
-    // Grab the defaults for this image type and preload the return value
-    $return_info = self::$images[ $image_type ][ 'defaults' ];
-
-    // If the option exists and is an array,
-    // iterate across the images in the option updating the return values as needed
-    if ( is_array( $image_type_option ) ) {
-      foreach ( $image_type_option as $index => $option ) {
-        // If this index is in the defaults and the image ID exists, get the image source info for that id
-        if ( array_key_exists( $index, $return_info ) && is_array( $option ) && array_key_exists( 'id', $option ) ) {
-          // Get the image source
-          $image_src = wp_get_attachment_image_src( $option[ 'id' ], 'full' );
-
-          // If a valid image is found, update the return value for this index
-          if ( is_array( $image_src ) ) {
-            $return_info[ $index ] = array(
-              'id' => $option[ 'id' ],
-              'url' => $image_src[0],
-              'fit' => array_key_exists( 'fit', $option ) ? $option[ 'fit' ] : $return_info[ $index ][ 'fit' ]
-            );
-          } // if valid image
-        } // if option has an id
-      } // foreach option
-    } // if option is an array
-
-    // Return the info
-    return $return_info;
+  // Get the url for an image using the provided image id
+  private static function get_image_url( $image_id ) {
+    // Get the image source
+    $image_src = wp_get_attachment_image_src( $image_id, 'full' );
+    // If it is an array, return the url (index 0), else return null
+    return is_array( $image_src ) ? $image_src[0] : null;
   }
+
+  // Get the image data out of post meta using the required memgame_id
+  // If no data exists, use the defaults
+  private static function get_images( $memgame_id ) {
+    // Get the image defaults
+    $image_defaults = self::get_image_defaults();
+    // Get the image data out of post meta
+    $raw_images = unserialize( get_post_meta( $memgame_id, 'mem_game_images', true ) );
+    // If there is no post meta data, return the defaults
+    if ( ! is_array( $raw_images ) ) return $image_defaults;
+
+    // Map the raw post meta data into the form being returned
+    // FIXME: I really want to use array_map here, but it is proving difficult right now.
+    //        Revisit at a later time if I get inspired with a new idea.
+    $return_images = array();
+    foreach ( $raw_images as $image_type => $image_type_data ) {
+      foreach ( $image_type_data as $image_index => $image_data ) {
+        // Get the url for this image
+        $image_url = self::get_image_url( $image_data[ 'id' ] );
+
+        // If the url is null, return the default image data
+        // Else, return the raw image data plus the image url
+        $return_images[ $image_type ][ $image_index ] =
+          is_null( $image_url )
+          ? $image_defaults[ $image_type ][ $image_index ]
+          : array(
+            'id' => $image_data[ 'id' ],
+            'fit' => $image_data[ 'fit' ],
+            'url' => $image_url
+        );
+      }
+    }
+
+    // Return the mapped image data
+    return $return_images;
+  }
+
+  // Format the image data for use in wp_localize_script
+  public static function get_images_for_localize_script( $memgame_id ) {
+    $all_image_data = self::get_images( $memgame_id );
+    // Return only the fit and url from each image
+    $return_image_data = array();
+    foreach( $all_image_data as $image_type => $image_type_data ) {
+      $return_image_data[ $image_type ] = array_map(
+        function( $image_data ) {
+          return array(
+            'fit' => $image_data[ 'fit' ],
+            'url' => $image_data[ 'url' ]
+          );
+        },
+        $image_type_data
+      );
+    }
+    return $return_image_data;
+  }
+
+  /* ********************************
+   * End new image accessor functions
+   * ********************************/
 
   // If this is a memgame post edit page, enqueue the media picker scripts
   public static function enqueue_scripts( $hook_suffix ) {
@@ -453,100 +418,57 @@ class MemCpt {
   }
 
   // Display the winner screen inputs
-  public static function display_winner_screen_input( $args ) {
-    // Get the current winner screen values
-    $all_options = self::get_winner_screen_options();
-
-    // Get the specific winner screen value needed
-    $sub_option = $args[ 'label_for' ] ;
-    $current_value =
-      array_key_exists( $sub_option, $all_options )
-      ? $all_options[ $sub_option ]
-      : self::$default_winner_screen_options[ $sub_option ];
-
+  public static function display_winner_screen_input( $field, $input_type, $value ) {
     ?>
     <input
-      type="<?php echo $args[ 'input_type' ]; ?>"
-      name="<?php echo sprintf( '%s[%s]', $args[ 'parent_option' ], $sub_option ); ?>"
-      id="<?php echo $sub_option; ?>"
-      value="<?php echo $current_value; ?>"
-      <?php if ( "url" === $args[ 'input_type' ] ) { echo 'placeholder="https://"'; } ?>
+      type="<?php echo $input_type; ?>"
+      name="<?php echo sprintf( 'mem_game_winner_screen[%s]', $field ); ?>"
+      id="<?php echo $field; ?>"
+      value="<?php echo $value; ?>"
+      <?php if ( "url" === $input_type ) { echo 'placeholder="https://"'; } ?>
       size="40"
     />
     <?php
   }
 
-  // Retrieve winner screen options
-  // Deviating from class-mem-settings.php here.
-  // Pass an optional memgame_id to the function instead of optional sub_option.
-  // This means that the caller has to pull out the sub_option data and/or find the default data
-  public static function get_winner_screen_options( $memgame_id = null ) {
+  // Retrieve winner screen data, memgame_id is required
+  public static function get_winner_screen( $memgame_id ) {
     // Get the current data out of postmeta
-    // If no memgame_id was provided, use the current post ID
-    global $post;
-    if ( null === $memgame_id ) {
-      $memgame_id = $post->ID;
-    }
     $current_options = unserialize( get_post_meta( $memgame_id, 'mem_game_winner_screen', true ) );
 
-    // Return the entire option array if it exists, an empty array if it doesn't
-    return is_array( $current_options ) ? $current_options : array();
+    // Return the current options array if it exists, the defaults if it does not
+    return
+      is_array( $current_options )
+      ? $current_options
+      : array_map(
+        function( $info ) {
+          return $info[ 'default' ];
+        },
+        self::$default_winner_screen_info
+      );
   }
 
-  // Retrieve the game board layout
-  public static function get_board_layout( $memgame_id = null ) {
-    // Get the current layout out of postmeta
-    // If no memgame_id was provided, use the current post ID
-    global $post;
-    if ( null === $memgame_id ) {
-      $memgame_id = $post->ID;
-    }
+  // Retrieve the title used on the edit screen for this field
+  public static function get_winner_screen_title( $field ) {
+    return self::$default_winner_screen_info[ $field ][ 'title' ];
+  }
+
+  // Retrieve the input type used on the edit screen for this field
+  public static function get_winner_screen_input_type( $field ) {
+    return self::$default_winner_screen_info[ $field ][ 'input_type' ];
+  }
+
+  // Retrieve the game board layout, memgame_id is required
+  public static function get_board_layout( $memgame_id ) {
     $current_layout = get_post_meta( $memgame_id, 'mem_game_board_layout', true );
 
     // Return the current layout if it exists, the default if it doesn't
-    return empty( $current_layout ) ? self::$board_layout[ 'default' ] : $current_layout;
+    return empty( $current_layout ) ? self::$default_board_layout_info[ 'default' ] : $current_layout;
   }
 
-  // Get the localized data to be sent to the front end JS
-  // FIXME: There has to be a better way of doing the image id to url conversion
-  //        and default images. This isn't as reuse friendly as I'd hoped.
-  public static function get_localized_image_data( $memgame_id = null ) {
-    // If no memgame_id was provided, return an empty array
-    if ( null == $memgame_id ) {
-      return array();
-    }
-
-    // Get the mem_game_images postmeta for this memgame_id
-    // FIXME: I'm not using this data for anything other than checking if the memgame_id is valid
-    //        This is bad
-    $image_data = unserialize( get_post_meta( $memgame_id, 'mem_game_images', true ) );
-
-    // If no image data found, return an empty array
-    if ( ! is_array( $image_data ) ) {
-      return array();
-    }
-
-    // Convert the postmeta data into something usable on the front end
-    $return_data = array();
-
-    // Iterate across the image types
-    foreach ( array_keys( $image_data ) as $image_type ) {
-      $return_data[ $image_type ] = array_map(
-        function ( $info ) {
-          // Return the fit and url from the image type info
-          return array(
-            'fit' => $info[ 'fit' ],
-            'url' => $info[ 'url' ]
-          );
-        },
-        // Reusing get_image_type_info here is causing some reuse problems
-        self::get_image_type_info( $image_type, $memgame_id )
-      );
-    }
-
-    // Return the data
-    return $return_data;
-  }
+  /* **************************
+   * Edit screen customizations
+   * **************************/
 
   // Add columns to the memgame list
   public static function add_cpt_custom_columns( $old_columns ) {
@@ -574,7 +496,8 @@ class MemCpt {
     }
   }
 
-  // Remove 'Quick Edit' from the post row actions
+  // Remove 'Quick Edit' from the post row inline actions
+  // It doesn't make sense for this CPT
   public static function remove_quick_edit( $old_actions, $post ) {
     if ( self::$slug === $post->post_type ) {
       // Make a copy, filtering out the 'inline hide-if-no-js' element (this is 'Quick Edit')
@@ -599,7 +522,8 @@ class MemCpt {
   //   mem_debug( 'My screen id is ' . $screen->id );
   // }
 
-  // Filter out the 'Edit' bulk action
+  // Filter out the 'Edit' bulk action (essentially the same as the 'Quick Edit' inline action)
+  // It doesn't make sense for this CPT
   public static function remove_edit_bulk_action( $old_actions ) {
     // Make a copy, filtering out the 'edit' element
     $new_actions = array();
@@ -610,4 +534,9 @@ class MemCpt {
     }
     return $new_actions;
   }
-}
+
+  /* ******************************
+   * End edit screen customizations
+   * ******************************/
+
+  }
