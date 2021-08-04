@@ -6,6 +6,12 @@
 .mg-wrap {
   position: relative;
 }
+.mg-wrap .mg-game {
+  z-index: 10;
+}
+.mg-wrap .mg-modal-wrap {
+  z-index: 20;
+}
 
 .mg-game {
   width: 100%;

@@ -8,6 +8,17 @@
 .mg-wrap {
   // Using relative to display the modal over the top of the game
   position: relative;
+
+  // There has been a report of the modal/winner screen being rendered below some of the cards
+  // I don't have a good explanation as to why this wouldn't always/never be true
+  // Since I've never seen it myself, I'm guessing it is a stacking context problem
+  // Set the z-index such that mg-game is always below .mg-modal-wrap
+  .mg-game {
+    z-index: 10;
+  }
+  .mg-modal-wrap {
+    z-index: 20;
+  }
 }
 
 .mg-game {
