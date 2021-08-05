@@ -177,3 +177,27 @@
     }
   }
 }
+
+// Add a tooltip for the mg-shortcode class
+// TODO: This will only work as written if the shortcode is in a text input, need to work on it.
+// .mg-shortcode-wrap {
+//   position: relative;
+
+//   .mg-shortcode:hover {
+//     cursor: pointer;
+//   }
+
+//   .mg-shortcode:hover::before {
+//     content: "Click to copy";
+//     position: absolute;
+//     top: -20px;
+//     left: -10px;
+//     // border: 1px solid black;
+//     border-radius: 4px;
+//     padding: 2px;
+//     background-color: rgba(0, 0, 0, 0.3);
+//     color: white;
+//     font-size: 10px;
+//     font-style: italic;
+//   }
+// }

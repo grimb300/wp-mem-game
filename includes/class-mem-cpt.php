@@ -97,9 +97,13 @@ class MemCpt {
   // Create the shortcode for display
   private static function display_shortcode( $memgame_id = null ) {
     // TODO: Create a copy to clipboard button for the shortcode(s)
+    // TODO: This will only work as written if the shortcode is in a text input, need to work on it.
+    // $shortcode = '<span class=mg-shortcode-wrap><code class="mg-shortcode">[memgame id=' . $memgame_id . ']</code></span>';
     $shortcode = '<code>[memgame id=' . $memgame_id . ']</code>';
     if ( get_post_meta( $memgame_id, 'mem_game_legacy', true ) ) {
       // Add the legacy shortcode
+      // TODO: This will only work as written if the shortcode is in a text input, need to work on it.
+      // $shortcode .= ' or <span class=mg-shortcode-wrap><code class="mg-shortcode">[memgame]</code></span>';
       $shortcode .= ' or <code>[memgame]</code>';
     }
     return $shortcode;

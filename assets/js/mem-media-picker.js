@@ -83,4 +83,18 @@ jQuery(function ($) {
     // Change the layout class on the mg-board-layout element
     boardLayoutElement.removeClass(currentLayoutClass).addClass(newLayoutClass);
   });
+
+  // Handle shortcode click to copy
+  // TODO: This will only work as written if the shortcode is in a text input, need to work on it.
+  // console.log("Setting up shortcode click to copy");
+  // const shortcodeWraps = $(".mg-shortcode-wrap");
+  // shortcodeWraps.each(function (index) {
+  //   const shortcodeText = $(this).find(".mg-shortcode");
+  //   $(this).on("click", function (event) {
+  //     shortcodeText.select();
+  //     // shortcodeText.setSelectionRange(0, 99999);
+  //     document.execCommand("copy");
+  //     alert("Copied shortcode to clipboard");
+  //   });
+  // });
 });
