@@ -42,12 +42,12 @@
           },
         },
         success: function (response) {
-          console.log("The response:");
-          console.log(response);
+          // console.log("The response:");
+          // console.log(response);
           if (response.success) {
-            console.log(
-              `Action mem_game_start was successful! Session Id ${response.data.session_id}`
-            );
+            // console.log(
+            //   `Action mem_game_start was successful! Session Id ${response.data.session_id}`
+            // );
             currentSessionID = response.data.session_id;
           } else {
             console.log("Action mem_game_start had some problems");
@@ -82,12 +82,12 @@
         },
       },
       success: function (response) {
-        console.log("The response:");
-        console.log(response);
+        // console.log("The response:");
+        // console.log(response);
         if (response.success) {
-          console.log(
-            `Action mem_game_complete was successful! Session Id ${currentSessionID}`
-          );
+          // console.log(
+          //   `Action mem_game_complete was successful! Session Id ${currentSessionID}`
+          // );
         } else {
           console.log("Action mem_game_complete had some problems");
         }
@@ -99,15 +99,15 @@
   const handleAbandonGame = (e) => {
     // If we're not collecting stats, do nothing
     if (!collectingStats) {
-      console.log("You never clicked once!!!");
+      // console.log("You never clicked once!!!");
       return;
     }
 
     // Send abandon game AJAX message
     e.preventDefault();
-    console.log(
-      `Sorry to see you go! You only tried ${collectedClicks} clicks!`
-    );
+    // console.log(
+    //   `Sorry to see you go! You only tried ${collectedClicks} clicks!`
+    // );
     jQuery.ajax({
       type: "post",
       dataType: "json",
@@ -123,12 +123,12 @@
         },
       },
       success: function (response) {
-        console.log("The response:");
-        console.log(response);
+        // console.log("The response:");
+        // console.log(response);
         if (response.success) {
-          console.log(
-            `Action mem_game_complete was successful! Session Id ${currentSessionID}`
-          );
+          // console.log(
+          //   `Action mem_game_complete was successful! Session Id ${currentSessionID}`
+          // );
         } else {
           console.log("Action mem_game_complete had some problems");
         }

@@ -40,6 +40,7 @@ class MemStats {
     // Add the function to catch the download_stats and clear_stats requests
     add_action( 'admin_init', 'MemGame\MemStats::clear_stats' );
     add_action( 'admin_init', 'MemGame\MemStats::download_stats' );
+    add_action( 'admin_init', 'MemGame\MemStats::enable_stats' );
 
     // Get the version stored in settings
     $current_version = get_option( 'mem_game_stats_version' );
@@ -94,7 +95,12 @@ class MemStats {
 
   // Start a new game
   public static function mem_game_start_ajax_handler() {
-    // mem_debug( 'Executing mem_game_start' );
+    // Check statistics enable
+    if ( 'OFF' === self::get_enable_stats_option() ) {
+      wp_send_json_success( array( 'session_id' => -1 ), 200 );
+    }
+
+    // Create database table name
     global $wpdb;
     $full_table_name = $wpdb->prefix . self::$table_name;
 
@@ -163,7 +169,12 @@ class MemStats {
 
   // Complete a game
   public static function mem_game_complete_ajax_handler() {
-    // mem_debug( 'Executing mem_game_complete' );
+    // Check statistics enable
+    if ( 'OFF' === self::get_enable_stats_option() ) {
+      wp_send_json_success( array( 'message' => 'Success!!!' ), 200 );
+    }
+
+    // Create database table name
     global $wpdb;
     $full_table_name = $wpdb->prefix . self::$table_name;
 
@@ -215,7 +226,12 @@ class MemStats {
 
   // Abandon a game
   public static function mem_game_abandon_ajax_handler() {
-    // mem_debug( 'Executing mem_game_abandon' );
+    // Check statistics enable
+    if ( 'OFF' === self::get_enable_stats_option() ) {
+      wp_send_json_success( array( 'message' => 'Success!!!' ), 200 );
+    }
+
+    // Create database table name
     global $wpdb;
     $full_table_name = $wpdb->prefix . self::$table_name;
 
@@ -450,13 +466,7 @@ class MemStats {
     }
 
     // Display the stats
-    // TODO: Add raw data display? Add reset stats button?
     ?>
-    <style>
-    .mem-game-stats > p {
-      font-size: 16px;
-    }
-    </style>
     <div class="mem-game-stats">
       <p>Analyzed <strong><?php echo $num_sessions; ?></strong> unique sessions and <strong><?php echo $totals[ 'games' ]; ?></strong> games (<strong><?php echo $totals[ 'completed' ]; ?></strong> completed and <strong><?php echo $totals[ 'abandoned' ]; ?></strong> abandoned).</p>
       <p>Each session averaged <strong><?php echo sprintf( '%.1f', $avg_completed_per_session ); ?></strong> completed games with <strong><?php echo $totals[ 'max_completed' ]; ?></strong> games being the most completed in one session.</p>
@@ -481,39 +491,95 @@ class MemStats {
   public static function display_stats_page() {
     // Create the clear/download stats URIs based on the current URI
     // add_query_arg with only a key/value pair adds the new arg to the existing $_SERVER['REQUEST_URI']
+    $enable_stats_uri = add_query_arg( 'enable_stats', '1' );
+    $disable_stats_uri = add_query_arg( 'enable_stats', '0' );
     $clear_stats_uri = add_query_arg( 'clear_stats', '1' );
     $download_stats_uri = add_query_arg( 'download_stats', '1' );
 
     ?>
+    <style>
+    .mem-game-stats > p {
+      font-size: 16px;
+    }
+    </style>
     <div class="wrap">
       <h1 class="wp-heading-inline">Memory Game Statistics</h1>
-      <?php $stats = self::get_analyzed_stats(); ?>
-      <?php
-      if ( ! empty( $msg ) ) {
-        ?>
-        <p><em><?php echo $msg; ?></em></p>
-        <?php
-      }
-      ?>
-      <a class="button button-secondary" href="<?php echo $clear_stats_uri; ?>">Clear Statistics</a>
-      <a class="button button-primary" href="<?php echo $download_stats_uri; ?>">Download Statistics</a>
+      <?php if ( self::get_enable_stats_option() === 'ON' ) { ?>
+        <div><a class="button button-primary" href="<?php echo $disable_stats_uri; ?>">Disable Collection</a></div>
+        <?php $stats = self::get_analyzed_stats(); ?>
+        <div>
+          <a class="button button-secondary" href="<?php echo $clear_stats_uri; ?>">Clear</a>
+          <a class="button button-primary" href="<?php echo $download_stats_uri; ?>">Download CSV</a>
+        </div>
+      <?php } else { ?>
+        <div><a class="button button-primary" href="<?php echo $enable_stats_uri; ?>">Enable Collection</a></div>
+        <div class="mem-game-stats"><p><em>User statistics collection is disabled.</em></p></div>
+      <?php } ?>
     </div>
     <?php
   }
 
+  private static function check_request_type( $query_arg ) {
+    // Check that this is a memtype/mem-game-stats page request with the provided query argument
+    return isset( $_GET[ 'post_type' ] ) && 'memgame' === $_GET[ 'post_type' ] &&
+           isset( $_GET[ 'page' ] ) && 'mem-game-stats' === $_GET[ 'page' ] &&
+           isset( $_GET[ $query_arg ] );
+  }
+
+  private static function validate_enable_stats_option( $enable_stats ) {
+    // Anything with a boolval of false or 'OFF' returns 'OFF'
+    // Else, return 'ON'
+    return ! boolval( $enable_stats ) || $enable_stats === 'OFF' ? 'OFF' : 'ON';
+  }
+
+  private static function get_enable_stats_option() {
+    // Default to "ON" (enabled) if the option doesn't exist
+    return get_option( 'mem_game_enable_stats', 'ON' );
+  }
+
+  private static function set_enable_stats_option( $enable_stats ) {
+    // Adding some data validation just in case
+    $validated_enable_stats = ! boolval( $enable_stats ) || $enable_stats === 'OFF' ? 'OFF' : 'ON';
+    update_option( 'mem_game_enable_stats', self::validate_enable_stats_option( $enable_stats ) );
+  }
+
+  public static function enable_stats() {
+    // Test if this is an enable_stats request
+    $is_enable_stats_request = self::check_request_type( 'enable_stats' );
+
+    if ( $is_enable_stats_request ) {
+      // Get the value of the enable_stats query arg
+      $new_enable = self::validate_enable_stats_option( $_GET[ 'enable_stats' ] );
+      // Get the current value of the enable in options (default to "1" if it doesn't exist)
+      $current_enable = self::get_enable_stats_option();
+
+      // If the new enable value is different than the current one, update
+      if ( $new_enable !== $current_enable ) {
+        self::set_enable_stats_option( $new_enable );
+      }
+
+      // Redirect without the enable_stats query arg
+      $request_uri = site_url( $_SERVER[ 'REQUEST_URI' ] );
+      $cleaned_uri = remove_query_arg( 'enable_stats', $request_uri );
+      wp_redirect( $cleaned_uri, 302 );
+
+      // Die, so the requested page isn't displayed
+      die();
+    }
+  }
+
   public static function clear_stats() {
     // Test if this is a clear_stats request
-    $is_clear_stats_request =
-      isset( $_GET[ 'post_type' ] ) && 'memgame' === $_GET[ 'post_type' ] &&
-      isset( $_GET[ 'page' ] ) && 'mem-game-stats' === $_GET[ 'page' ] &&
-      isset( $_GET[ 'clear_stats' ] );
+    $is_clear_stats_request = self::check_request_type( 'clear_stats' );
+      // isset( $_GET[ 'post_type' ] ) && 'memgame' === $_GET[ 'post_type' ] &&
+      // isset( $_GET[ 'page' ] ) && 'mem-game-stats' === $_GET[ 'page' ] &&
+      // isset( $_GET[ 'clear_stats' ] );
 
     if ( $is_clear_stats_request ) {
       // Create the stats table which will drop the old table first
       self::create_stats_table();
       
-      // Redirect without the clear_stats parameter
-      global $wp;
+      // Redirect without the clear_stats query arg
       $request_uri = site_url( $_SERVER[ 'REQUEST_URI' ] );
       $cleaned_uri = remove_query_arg( 'clear_stats', $request_uri );
       wp_redirect( $cleaned_uri, 302 );
@@ -528,10 +594,10 @@ class MemStats {
     $full_table_name = $wpdb->prefix . self::$table_name;
 
     // Test if this is a download_stats request
-    $is_download_stats_request =
-      isset( $_GET[ 'post_type' ] ) && 'memgame' === $_GET[ 'post_type' ] &&
-      isset( $_GET[ 'page' ] ) && 'mem-game-stats' === $_GET[ 'page' ] &&
-      isset( $_GET[ 'download_stats' ] );
+    $is_download_stats_request = self::check_request_type( 'download_stats' );
+      // isset( $_GET[ 'post_type' ] ) && 'memgame' === $_GET[ 'post_type' ] &&
+      // isset( $_GET[ 'page' ] ) && 'mem-game-stats' === $_GET[ 'page' ] &&
+      // isset( $_GET[ 'download_stats' ] );
 
     if ( $is_download_stats_request ) {
       // Get the stats out of the database
