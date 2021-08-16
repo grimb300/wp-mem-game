@@ -22,19 +22,20 @@ class MemUpgrade {
 
     // Compare the saved version with the current plugin version
     if ( empty( $old_plugin_version ) || ( $new_plugin_version !== $old_plugin_version ) ) {
-      mem_debug(
-        sprintf(
-          'Upgrading WpMemGame from %s to %s',
-          empty( $old_plugin_version ) ? 'N/A' : $old_plugin_version,
-          $new_plugin_version
-        )
-      );
+      // mem_debug(
+      //   sprintf(
+      //     'Upgrading WpMemGame from %s to %s',
+      //     empty( $old_plugin_version ) ? 'N/A' : $old_plugin_version,
+      //     $new_plugin_version
+      //   )
+      // );
 
       // Upgrade to version 0.3
       if ( '0.3' === $new_plugin_version ) {
         // Get the legacy memory game definition, if it exists
         $legacy_images = get_option( 'mem_game_images' );
         $legacy_winner_screen = get_option( 'mem_game_winner_screen' );
+        // mem_debug( 'Got the legacy images and winner screen data' );
   
         // If they exist, convert options to custom post
         if ( is_array( $legacy_images ) && is_array( $legacy_winner_screen ) ) {
@@ -49,7 +50,7 @@ class MemUpgrade {
               'mem_game_legacy' => true,
             ),
           ) );
-          mem_debug( 'Converted legacy memory game to post ID ' . $post_id );
+          // mem_debug( 'Converted legacy memory game to post ID ' . $post_id );
         }
 
         // Delete the options, even if they didn't exist, leave no trace

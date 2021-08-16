@@ -26,10 +26,11 @@ class MemGame {
     // $this->init_settings();
     
     // Initialize the upgrade engine
-    // FIXME: Long term this should be a part of the activation flow
-    // if ( is_admin() ) {
-    //   $this->init_upgrade();
-    // }
+    // NOTE: Test upgrade on every admin page load,
+    //       there is no consistent path to follow for a plugin update
+    //       (activation hook isn't always called)
+    $this->init_upgrade();
+
     // Create the shortcode
     $this->create_shortcode();
 
@@ -50,7 +51,7 @@ class MemGame {
 
   private function init_upgrade() {
     require_once MEM_GAME_PATH . 'includes/class-mem-upgrade.php';
-    MemUpgrade::init();
+    add_action( 'admin_init', 'MemGame\MemUpgrade::init' );
   }
 
   private function init_settings() {
@@ -80,9 +81,7 @@ class MemGame {
 
   // Activation
   public function mem_game_activation() {
-    mem_debug( 'MemGame activate!' );
-    // Upgrade anything that needs upgrading
-    $this->init_upgrade();
+    // mem_debug( 'MemGame activate!' );
   }
 
   // Deactivation
