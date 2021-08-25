@@ -56,23 +56,49 @@ class MemShortcode {
 
 
     // Get the winner screen text out of options
+    
+    // Get the game board layout
+    
+    // Get the "How to play" section
+    $how_to_play = self::get_how_to_play();
+    
+    // Get the game board
+    $game_board_layout = MemCpt::get_board_layout( $memgame_id );
+    $card_images = MemCpt::get_images_for_localize_script( $memgame_id );
+    $game_board = self::get_game_board(
+      array(
+        'layout' => $game_board_layout,
+        'card_images' => $card_images,
+      )
+    );
+    
+    // Get the winner screen modal
     $winner_screen_info = MemCpt::get_winner_screen( $memgame_id );
     // If the memory game wasn't found, return an error
     if ( empty( $winner_screen_info ) ) {
       return '<h5>No matching Memory Game found.</h5>';
     }
-    // Else, pull the individual fields out of the array
-    $winner_msg = $winner_screen_info[ 'winner_msg' ];
-    $play_again_txt = $winner_screen_info[ 'play_again_txt' ];
-    $quit_txt = $winner_screen_info[ 'quit_txt' ];
-    $quit_url = $winner_screen_info[ 'quit_url' ];
-
-    // Get the game board layout
-    $game_board_layout = MemCpt::get_board_layout( $memgame_id );
-
+    $winner_screen = self::get_winner_screen( $winner_screen_info );
+    
     // Build the game layout
-    $game = <<<END
-    <div class="mg-how-to-play">
+    $game = $how_to_play . "<div class=\"mg-wrap\">" . $game_board . $winner_screen . "</div>";
+    
+    // Enqueue the necessary JS and CSS
+    self::enqueue_memgame_css();
+    self::enqueue_memgame_js( $memgame_id, $post_id );
+    
+    // Return a single card for debug purposes
+    return self::get_card( array(
+      'card_front' => $card_images[ 'card_front' ][ 0 ],
+      'card_back' => $card_images[ 'card_back' ][ 0 ]
+    ) );
+    return $game;
+  }
+  
+  // Return the "How to play" section
+  private static function get_how_to_play() {
+    return
+    "<div class=\"mg-how-to-play\">
       <h5>How to play:</h5>
       <ol>
         <li>Select one of the face down cards by clicking on it.</li>
@@ -80,26 +106,74 @@ class MemShortcode {
         <li>If the cards match, both will remain face up. Otherwise, the cards will turn face down again.</li>
         <li>Repeat until all cards are face up.</li>
       </ol>
-    </div>
-    <div class="mg-wrap">
-      <div class="mg-game mg-layout-$game_board_layout"></div>
-      <div class="mg-modal-wrap">
-        <div class="mg-modal-overlay">
-          <div class="mg-modal">
-            <h2 class="mg-winner">$winner_msg</h2>
-            <button class="mg-restart">$play_again_txt</button>
-            <a href="$quit_url"><button class="mg-leave">$quit_txt</button></a>
-          </div>
+    </div>";
+  }
+  
+  // Return the game board
+  private static function get_game_board( $params ) {
+    $game_board_layout = $params[ 'layout' ];
+    $card_images = $params[ 'card_images' ];
+
+    // Generate the card HTML
+    $cards = "";
+    $card_back = $card_images[ 'card_back' ][ 0 ];
+    foreach ( $card_images[ 'card_front' ] as $card_front ) {
+      // Get the card
+      $card = self::get_card(
+        array(
+          'card_front' => $card_front,
+          'card_back' => $card_back,
+        )
+      );
+      // Add two of them to the list of cards
+      $cards .= $card . $card;
+    }
+
+    return "<div class=\"mg-game mg-layout-$game_board_layout\">$cards</div>";
+  }
+
+  // Return a pair of cards
+  private static function get_card( $params ) {
+    // mem_debug( 'Card Front' );
+    // mem_debug( $params )
+    $card_front_url = $params[ 'card_front' ][ 'url' ];
+    $card_back_url = $params[ 'card_back' ][ 'url' ];
+
+    // Create a card
+    $card = 
+    "<div class=\"mg-new-card\">
+      <div class=\"mg-new-inside\">
+        <div class=\"mg-new-front\">
+          <img src=\"$card_front_url\">
+        </div>
+        <div class=\"mg-new-back\">
+          <img src=\"$card_back_url\">
         </div>
       </div>
-    </div><!-- End Wrap -->
-    END;
+    </div>";
 
-    // Enqueue the necessary JS and CSS
-    self::enqueue_memgame_css();
-    self::enqueue_memgame_js( $memgame_id, $post_id );
+    // Return it
+    return $card;
+  }
+  
+  // Return the winner screen
+  private static function get_winner_screen( $winner_screen_info ) {
+    // Pull the individual fields out of the array
+    $winner_msg = $winner_screen_info[ 'winner_msg' ];
+    $play_again_txt = $winner_screen_info[ 'play_again_txt' ];
+    $quit_txt = $winner_screen_info[ 'quit_txt' ];
+    $quit_url = $winner_screen_info[ 'quit_url' ];
 
-    return $game;
+    return
+    "<div class=\"mg-modal-wrap\">
+      <div class=\"mg-modal-overlay\">
+        <div class=\"mg-modal\">
+          <h2 class=\"mg-winner\">$winner_msg</h2>
+          <button class=\"mg-restart\">$play_again_txt</button>
+          <a href=\"$quit_url\"><button class=\"mg-leave\">$quit_txt</button></a>
+        </div>
+      </div>
+    </div>";
   }
 
   // Enqueue CSS file
@@ -130,8 +204,10 @@ class MemShortcode {
   // Register the necessary JavaScript and CSS to be enqueued later
   public function register_memgame_scripts() {
     // Path to the CSS file
-    $mem_game_css_path = MEM_GAME_PATH . 'assets/css/mem-game.css';
-    $mem_game_css_url = MEM_GAME_URL . 'assets/css/mem-game.css';
+    // $mem_game_css_path = MEM_GAME_PATH . 'assets/css/mem-game.css';
+    // $mem_game_css_url = MEM_GAME_URL . 'assets/css/mem-game.css';
+    $mem_game_css_path = MEM_GAME_PATH . 'assets/css/mem-game-experiment.css';
+    $mem_game_css_url = MEM_GAME_URL . 'assets/css/mem-game-experiment.css';
 
     // Create the version based on the file modification time
     $mem_game_css_ver = date( 'ymd-Gis', fileatime( $mem_game_css_path ) );
@@ -140,14 +216,17 @@ class MemShortcode {
     wp_register_style( 'mem_game_css', $mem_game_css_url, array(), $mem_game_css_ver );
 
     // Path to JS file
-    $mem_game_js_path = MEM_GAME_PATH . 'assets/js/mem-game.js';
-    $mem_game_js_url = MEM_GAME_URL . 'assets/js/mem-game.js';
+    // $mem_game_js_path = MEM_GAME_PATH . 'assets/js/mem-game.js';
+    // $mem_game_js_url = MEM_GAME_URL . 'assets/js/mem-game.js';
+    $mem_game_js_path = MEM_GAME_PATH . 'assets/js/mem-game-rewrite.js';
+    $mem_game_js_url = MEM_GAME_URL . 'assets/js/mem-game-rewrite.js';
 
     // Create the version based on the file modification time
     $mem_game_js_ver = date( 'ymd-Gis', fileatime( $mem_game_js_path ) );
 
     // Register the JS file
     // The borrowed JS needs jQuery (the CodePen used ver 2.1.3, assuming the default WP ver will do)
-    wp_register_script( 'mem_game_js', $mem_game_js_url, array( 'jquery' ), $mem_game_js_ver, true );
+    // wp_register_script( 'mem_game_js', $mem_game_js_url, array( 'jquery' ), $mem_game_js_ver, true );
+    wp_register_script( 'mem_game_js', $mem_game_js_url, array(), $mem_game_js_ver, true );
   }
 }

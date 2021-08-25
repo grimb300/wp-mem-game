@@ -1,0 +1,88 @@
+/* The CSS below is taken straight from the tutorial, it still isn't quite working */
+/* Adding all the vendor prefixes, just in case */
+
+.mg-new-front {
+  background: magenta;
+}
+
+.mg-new-back {
+  background: yellow;
+}
+
+/* entire container, keeps perspective */
+/* required to get 3d effect */
+.mg-new-card {
+  perspective: 1000px;
+  -moz-perspective: 1000px;
+  -webkit-perspective: 1000px;
+  -ms-perspective: 1000px;
+  -o-perspective: 1000px;
+}
+/* flip the pane when hovered */
+/* .mg-new-card:hover .mg-new-inside,
+.mg-new-card.hover .mg-new-inside { */
+.mg-new-card.mg-picked .mg-new-inside {
+  transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  -ms-transform: rotateY(180deg);
+  -o-transform: rotateY(180deg);
+}
+
+.mg-new-card,
+.mg-new-front,
+.mg-new-back {
+  width: 320px;
+  height: 480px;
+}
+
+/* flip speed goes here */
+.mg-new-inside {
+  transition: 0.6s;
+  -moz-transition: 0.6s;
+  -webkit-transition: 0.6s;
+  -ms-transition: 0.6s;
+  -o-transition: 0.6s;
+
+  transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  -ms-transform-style: preserve-3d;
+  -o-transform-style: preserve-3d;
+
+  position: relative;
+}
+
+/* hide back of pane during swap */
+.mg-new-front,
+.mg-new-back {
+  backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  -o-backface-visibility: hidden;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* front pane, placed above back */
+.mg-new-front {
+  z-index: 2;
+  /* for firefox 31 */
+  transform: rotateY(0deg);
+  -moz-transform: rotateY(0deg);
+  -webkit-transform: rotateY(0deg);
+  -ms-transform: rotateY(0deg);
+  -o-transform: rotateY(0deg);
+}
+
+/* back, initially hidden pane */
+.mg-new-back {
+  transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  -ms-transform: rotateY(180deg);
+  -o-transform: rotateY(180deg);
+}
