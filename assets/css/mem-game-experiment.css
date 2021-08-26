@@ -37,16 +37,15 @@
   width: 100px;
   height: 125px;
 } */
-.mg-new-card {
+/* .mg-new-card {
   width: 100px;
-}
+} */
 
 /* Adding background colors when grid isn't used */
-.mg-new-front {
-  background: red;
-}
+/* Looks like the background color has to be on the front/back, not on the inside element */
+.mg-new-front,
 .mg-new-back {
-  background: blue;
+  background: whitesmoke;
 }
 
 /* z-index experiment */
@@ -59,8 +58,12 @@
   /* This appears to be a possible source of the glitch */
   padding-top: 125%;
   height: 0;
-  /* display: block;
-  background: white; */
+  /* Don't think display block is needed */
+  /* display: block; */
+  /* Changing to whitesmoke only so it is easier to see when the page background is white */
+  /* Looks like the background color has to be on the front/back, not on the inside element */
+  /* background: white; */
+  /* background: whitesmoke; */
 }
 
 /* Skipping picked/matched rotateY transform */
@@ -71,11 +74,19 @@
 .mg-new-front,
 .mg-new-back {
   border: 1px solid black;
-  /* padding: 5px; */
+  padding: 5px;
   width: 100%;
   height: 100%;
-  /* display: flex;
-  align-items: center; */
+  display: flex;
+  align-items: center;
+}
+
+.mg-new-front img,
+.mg-new-back img {
+  width: 100%;
+  height: 100%;
+  object-fit: scale-down;
+  margin: 0 auto;
 }
 
 /* End reuse from the old files */

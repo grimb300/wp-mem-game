@@ -204,10 +204,10 @@ class MemShortcode {
   // Register the necessary JavaScript and CSS to be enqueued later
   public function register_memgame_scripts() {
     // Path to the CSS file
-    // $mem_game_css_path = MEM_GAME_PATH . 'assets/css/mem-game.css';
-    // $mem_game_css_url = MEM_GAME_URL . 'assets/css/mem-game.css';
-    $mem_game_css_path = MEM_GAME_PATH . 'assets/css/mem-game-experiment.css';
-    $mem_game_css_url = MEM_GAME_URL . 'assets/css/mem-game-experiment.css';
+    $mem_game_css_path = MEM_GAME_PATH . 'assets/css/mem-game.css';
+    $mem_game_css_url = MEM_GAME_URL . 'assets/css/mem-game.css';
+    // $mem_game_css_path = MEM_GAME_PATH . 'assets/css/mem-game-experiment.css';
+    // $mem_game_css_url = MEM_GAME_URL . 'assets/css/mem-game-experiment.css';
 
     // Create the version based on the file modification time
     $mem_game_css_ver = date( 'ymd-Gis', fileatime( $mem_game_css_path ) );
