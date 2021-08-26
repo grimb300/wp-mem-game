@@ -29,3 +29,4 @@ sass --watch assets/sass:assets/css
 | 0.1     | First beta.                                                                                                                                                       |
 | 0.2     | Fixes image picker bug. Adds image fit selection (cover or scale) and winner screen text/button options. Better styling to force cards into a fixed aspect ratio. |
 | 0.3     | Enable multiple game definitions. Add game board layout configuration (6x4, 4x6, etc.).                                                                           |
+| 0.3.1   | Fixes an animation display bug on iOS-Chrome.                                                                                                                     |
