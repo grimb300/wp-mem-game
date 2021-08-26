@@ -1,13 +1,47 @@
+/* This section is mostly taken from the old SCSS/CSS file to set up the game board */
+
+/* Skipping the box-sizing for now */
+.mg-wrap,
+.mg-wrap * {
+  box-sizing: border-box;
+}
+
+.mg-wrap {
+  position: relative;
+}
+
+/* Skipping the z-index for mg-game and mg-modal-wrap for now */
+
+.mg-game {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  gap: 5px;
+}
+
+.mg-game,
+.mg-game.mg-layout-6x4 {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.mg-game.mg-layout-4x6 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Skipping the keyframes for matchAnima for now */
+
+/* Only copying the background and aspect ratio styles */
+.mg-new-inside {
+  /* This appears to be a possible source of the glitch */
+  /* padding-top: 125%;
+  height: 0; */
+  background: white;
+}
+
+/* End reuse from the old files */
+
 /* The CSS below is taken straight from the tutorial, it still isn't quite working */
 /* Adding all the vendor prefixes, just in case */
-
-.mg-new-front {
-  background: magenta;
-}
-
-.mg-new-back {
-  background: yellow;
-}
 
 /* entire container, keeps perspective */
 /* required to get 3d effect */
@@ -29,12 +63,12 @@
   -o-transform: rotateY(180deg);
 }
 
-.mg-new-card,
+/* .mg-new-card,
 .mg-new-front,
 .mg-new-back {
   width: 320px;
   height: 480px;
-}
+} */
 
 /* flip speed goes here */
 .mg-new-inside {

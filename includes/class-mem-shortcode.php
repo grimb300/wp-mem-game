@@ -88,10 +88,10 @@ class MemShortcode {
     self::enqueue_memgame_js( $memgame_id, $post_id );
     
     // Return a single card for debug purposes
-    return self::get_card( array(
-      'card_front' => $card_images[ 'card_front' ][ 0 ],
-      'card_back' => $card_images[ 'card_back' ][ 0 ]
-    ) );
+    // return self::get_card( array(
+    //   'card_front' => $card_images[ 'card_front' ][ 0 ],
+    //   'card_back' => $card_images[ 'card_back' ][ 0 ]
+    // ) );
     return $game;
   }
   
