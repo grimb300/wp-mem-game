@@ -184,7 +184,7 @@
 }
 
 .mg-back {
-  z-index: 2;
+  z-index: 3;
   transform: rotateY(0deg);
   -moz-transform: rotateY(0deg);
   -webkit-transform: rotateY(0deg);

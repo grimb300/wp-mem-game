@@ -251,7 +251,7 @@
 // Front pane, placed above back
 // For the memory game, the back of the card is actually the front pane
 .mg-back {
-  z-index: 2;
+  z-index: 3;
 
   transform: rotateY(0deg);
   -moz-transform: rotateY(0deg);
