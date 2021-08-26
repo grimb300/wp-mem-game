@@ -70,19 +70,13 @@
   // https://css-tricks.com/aspect-ratio-boxes/
   padding-top: math.div(5, 4) * 100%; // 4x5 card aspect ratio
   height: 0;
-  position: relative;
-
-  display: block;
-  transform-style: preserve-3d;
-  transition: 0.4s ease-in-out;
-  background: white;
 
   &.mg-picked,
   &.mg-matched {
     transform: rotateY(180deg);
   }
 
-  &.mg-matched {
+  &.mg-matched .mg-front {
     animation: 1s matchAnim ease-in-out;
     animation-delay: 0.4s;
   }
@@ -96,7 +90,7 @@
   left: 0;
 
   border: 1px solid black;
-  backface-visibility: hidden;
+  background: white;
   padding: 5px;
   width: 100%;
   height: 100%;
@@ -115,14 +109,6 @@
   img.mg-fit-cover {
     object-fit: cover;
   }
-}
-
-.mg-front {
-  transform: rotateY(-180deg);
-}
-
-.mg-back {
-  transform: rotateY(0);
 }
 
 .mg-modal-wrap {
@@ -201,3 +187,89 @@
 //     font-style: italic;
 //   }
 // }
+
+////////////////////////
+// The card flip section
+////////////////////////
+
+// The original code from the codepen example worked for everything except for iOS devices (Safari and Chrome)
+// I found another tutorial that fixed it most of the way and only required a couple of tweaks on my part:
+// https://davidwalsh.name/css-flip
+// Had to look at the actual css used in his demo for all of the vendor prefixes
+// https://davidwalsh.name/demo/css-flip.php
+
+// Perspective required for the 3d effect
+.mg-card {
+  perspective: 1000px;
+  -moz-perspective: 1000px;
+  -webkit-perspective: 1000px;
+  -ms-perspective: 1000px;
+  -moz-perspective: 1000px;
+}
+
+// Flip the inside pane when picked or matched
+.mg-card.mg-picked .mg-inside,
+.mg-card.mg-matched .mg-inside {
+  transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  -ms-transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
+}
+
+// Flip speed goes here
+.mg-inside {
+  transition: 0.6s;
+  -moz-transition: 0.6s;
+  -webkit-transition: 0.6s;
+  -ms-transition: 0.6s;
+  -moz-transition: 0.6s;
+
+  transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  -ms-transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+
+  position: relative;
+}
+
+// Hide the back of the pane during swap
+.mg-front,
+.mg-back {
+  backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -ms-backface-visibility: hidden;
+  -moz-backface-visibility: hidden;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+// Front pane, placed above back
+// For the memory game, the back of the card is actually the front pane
+.mg-back {
+  z-index: 2;
+
+  transform: rotateY(0deg);
+  -moz-transform: rotateY(0deg);
+  -webkit-transform: rotateY(0deg);
+  -ms-transform: rotateY(0deg);
+  -moz-transform: rotateY(0deg);
+}
+
+// Back pane, initially hidden
+// For the memory game, the front of the card is actually the back pane
+.mg-front {
+  // Found through a lot of trial and error that this one also needs to have a z-index
+  // Maybe it really should be 1 below the front, which means mg-front should be z-index: 3
+  z-index: 2;
+
+  transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
+  -ms-transform: rotateY(180deg);
+  -moz-transform: rotateY(180deg);
+}
