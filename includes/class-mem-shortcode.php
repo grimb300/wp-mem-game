@@ -71,8 +71,31 @@ class MemShortcode {
     $game_board_layout = MemCpt::get_board_layout( $memgame_id );
 
     // Build the game layout
-    $game = <<<END
-    <div class="mg-how-to-play">
+    // $game = <<<END
+    // <div class="mg-how-to-play">
+    //   <h5>How to play:</h5>
+    //   <ol>
+    //     <li>Select one of the face down cards by clicking on it.</li>
+    //     <li>Select a second face down card, attempting to find a match to the first card.</li>
+    //     <li>If the cards match, both will remain face up. Otherwise, the cards will turn face down again.</li>
+    //     <li>Repeat until all cards are face up.</li>
+    //   </ol>
+    // </div>
+    // <div class="mg-wrap">
+    //   <div class="mg-game mg-layout-$game_board_layout"></div>
+    //   <div class="mg-modal-wrap">
+    //     <div class="mg-modal-overlay">
+    //       <div class="mg-modal">
+    //         <h2 class="mg-winner">$winner_msg</h2>
+    //         <button class="mg-restart">$play_again_txt</button>
+    //         <a href="$quit_url"><button class="mg-leave">$quit_txt</button></a>
+    //       </div>
+    //     </div>
+    //   </div>
+    // </div><!-- End Wrap -->
+    // END;
+    $game = "
+    <div class=\"mg-how-to-play\">
       <h5>How to play:</h5>
       <ol>
         <li>Select one of the face down cards by clicking on it.</li>
@@ -81,19 +104,19 @@ class MemShortcode {
         <li>Repeat until all cards are face up.</li>
       </ol>
     </div>
-    <div class="mg-wrap">
-      <div class="mg-game mg-layout-$game_board_layout"></div>
-      <div class="mg-modal-wrap">
-        <div class="mg-modal-overlay">
-          <div class="mg-modal">
-            <h2 class="mg-winner">$winner_msg</h2>
-            <button class="mg-restart">$play_again_txt</button>
-            <a href="$quit_url"><button class="mg-leave">$quit_txt</button></a>
+    <div class=\"mg-wrap\">
+      <div class=\"mg-game mg-layout-$game_board_layout\"></div>
+      <div class=\"mg-modal-wrap\">
+        <div class=\"mg-modal-overlay\">
+          <div class=\"mg-modal\">
+            <h2 class=\"mg-winner\">$winner_msg</h2>
+            <button class=\"mg-restart\">$play_again_txt</button>
+            <a href=\"$quit_url\"><button class=\"mg-leave\">$quit_txt</button></a>
           </div>
         </div>
       </div>
     </div><!-- End Wrap -->
-    END;
+    ";
 
     // Enqueue the necessary JS and CSS
     self::enqueue_memgame_css();

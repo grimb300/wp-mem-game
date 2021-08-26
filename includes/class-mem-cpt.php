@@ -67,7 +67,7 @@ class MemCpt {
       'Memory Game Settings',
       'MemGame\MemCpt::render_mem_cpt_meta_box',
       'memgame', 'normal',
-      'high',
+      'high'
     );
   }
 
