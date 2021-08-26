@@ -30,12 +30,52 @@
 
 /* Skipping the keyframes for matchAnima for now */
 
+/* Adding an absolute width when grid isn't used */
+/* .mg-new-card,
+.mg-new-front,
+.mg-new-back {
+  width: 100px;
+  height: 125px;
+} */
+.mg-new-card {
+  width: 100px;
+}
+
+/* Adding background colors when grid isn't used */
+.mg-new-front {
+  background: red;
+}
+.mg-new-back {
+  background: blue;
+}
+
+/* z-index experiment */
+.mg-new-back {
+  z-index: 2;
+}
+
 /* Only copying the background and aspect ratio styles */
 .mg-new-inside {
   /* This appears to be a possible source of the glitch */
-  /* padding-top: 125%;
-  height: 0; */
-  background: white;
+  padding-top: 125%;
+  height: 0;
+  /* display: block;
+  background: white; */
+}
+
+/* Skipping picked/matched rotateY transform */
+
+/* Skipping matched animation */
+
+/* Only copying the border, padding, height/width, and flexbox styles */
+.mg-new-front,
+.mg-new-back {
+  border: 1px solid black;
+  /* padding: 5px; */
+  width: 100%;
+  height: 100%;
+  /* display: flex;
+  align-items: center; */
 }
 
 /* End reuse from the old files */
