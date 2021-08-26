@@ -4,7 +4,7 @@
  * Plugin Name:       WordPress Memory Game
  * Plugin URI:        https://candolatitude.com/
  * Description:       Add a memory game to any WordPress post or page
- * Version:           0.3
+ * Version:           0.3.1
  * Requires at least: 5.2
  * Requires PHP:      7.2
  * Author:            Bob Grim

@@ -81,6 +81,7 @@ class MemShortcode {
     $winner_screen = self::get_winner_screen( $winner_screen_info );
     
     // Build the game layout
+<<<<<<< HEAD
     $game = $how_to_play . "<div class=\"mg-wrap\">" . $game_board . $winner_screen . "</div>";
     
     // Enqueue the necessary JS and CSS
@@ -99,6 +100,33 @@ class MemShortcode {
   private static function get_how_to_play() {
     return
     "<div class=\"mg-how-to-play\">
+=======
+    // $game = <<<END
+    // <div class="mg-how-to-play">
+    //   <h5>How to play:</h5>
+    //   <ol>
+    //     <li>Select one of the face down cards by clicking on it.</li>
+    //     <li>Select a second face down card, attempting to find a match to the first card.</li>
+    //     <li>If the cards match, both will remain face up. Otherwise, the cards will turn face down again.</li>
+    //     <li>Repeat until all cards are face up.</li>
+    //   </ol>
+    // </div>
+    // <div class="mg-wrap">
+    //   <div class="mg-game mg-layout-$game_board_layout"></div>
+    //   <div class="mg-modal-wrap">
+    //     <div class="mg-modal-overlay">
+    //       <div class="mg-modal">
+    //         <h2 class="mg-winner">$winner_msg</h2>
+    //         <button class="mg-restart">$play_again_txt</button>
+    //         <a href="$quit_url"><button class="mg-leave">$quit_txt</button></a>
+    //       </div>
+    //     </div>
+    //   </div>
+    // </div><!-- End Wrap -->
+    // END;
+    $game = "
+    <div class=\"mg-how-to-play\">
+>>>>>>> main
       <h5>How to play:</h5>
       <ol>
         <li>Select one of the face down cards by clicking on it.</li>
@@ -106,6 +134,7 @@ class MemShortcode {
         <li>If the cards match, both will remain face up. Otherwise, the cards will turn face down again.</li>
         <li>Repeat until all cards are face up.</li>
       </ol>
+<<<<<<< HEAD
     </div>";
   }
   
@@ -151,6 +180,22 @@ class MemShortcode {
         </div>
       </div>
     </div>";
+=======
+    </div>
+    <div class=\"mg-wrap\">
+      <div class=\"mg-game mg-layout-$game_board_layout\"></div>
+      <div class=\"mg-modal-wrap\">
+        <div class=\"mg-modal-overlay\">
+          <div class=\"mg-modal\">
+            <h2 class=\"mg-winner\">$winner_msg</h2>
+            <button class=\"mg-restart\">$play_again_txt</button>
+            <a href=\"$quit_url\"><button class=\"mg-leave\">$quit_txt</button></a>
+          </div>
+        </div>
+      </div>
+    </div><!-- End Wrap -->
+    ";
+>>>>>>> main
 
     // Return it
     return $card;
