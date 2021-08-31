@@ -119,32 +119,34 @@ class MemCpt {
         <tr>
           <th scope="row">Dimensions</th>
           <td>
-            <select name="mem_game_board_layout" id="mem_game_board_layout">
+            <select name="mem_game_board_layout" id="mem_game_board_layout" disabled>
               <?php $current_layout = self::get_board_layout( $post->ID ); ?>
               <?php foreach( self::$default_board_layout_info[ 'options' ] as $layout ) { ?>
-                <option value="<?php echo $layout; ?>" <?php echo $layout === $current_layout ? 'selected' : ''; ?>><?php echo $layout; ?></option>
+                <option value="<?php echo $layout; ?>" <?php echo $layout === $current_layout ? 'selected' : ''; ?>>Auto (previously <?php echo $layout; ?>)</option>
               <?php } ?>
             </select>
           </td>
+          <!-- Removing while "Auto" is the only option
           <td>
             <div class="mg-wrap">
-              <div class="mg-game mg-layout-<?php echo $current_layout; ?> mg-board-layout">
+              <div class="mg-game mg-layout-<?php //echo $current_layout; ?> mg-board-layout">
               <?php
               // Loop across the 24 cards used in the layout
-              for ( $i = 0; $i < 24; $i += 1 ) {
+              //for ( $i = 0; $i < 24; $i += 1 ) {
                 ?>
                 <div div class="mg-card">
                   <div class="mg-inside">
                     <div class="mg-back">
-                    </div> <!-- .mg-back -->
-                  </div> <!-- .mg-inside -->
-                </div> <!-- .mg-card -->
+                    </div>
+                  </div>
+                </div>
                 <?php
-              }
+              //}
               ?>
-              </div> <!-- .mg-game -->
-            </div> <!-- .mg-wrap -->
+              </div>
+            </div>
           </td>
+          -->
         </tr>
       </tbody>
     </table>
