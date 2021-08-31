@@ -137,6 +137,11 @@
   color: #4d4d4d;
   text-shadow: 0px 3px 0 black;
 }
+@media screen and (max-width: 667px) {
+  .mg-modal .mg-winner {
+    font-size: 60px;
+  }
+}
 .mg-modal .mg-modal-buttons {
   display: flex;
   flex-direction: column;
@@ -162,6 +167,12 @@
 .mg-modal .mg-modal-buttons .mg-restart:hover,
 .mg-modal .mg-modal-buttons .mg-leave:hover {
   background: linear-gradient(#222, black);
+}
+@media screen and (max-width: 667px) {
+  .mg-modal .mg-modal-buttons .mg-restart,
+.mg-modal .mg-modal-buttons .mg-leave {
+    font-size: 15px;
+  }
 }
 
 .mg-card {

@@ -181,10 +181,10 @@
     color: #4d4d4d;
     text-shadow: 0px 3px 0 black;
 
-    // Hoping that the use of flexbox means this isn't needed
-    // @media screen and (max-width: 667px) {
-    //   font-size: 50px;
-    // }
+    // For now, only reduce the font size on small screens
+    @media screen and (max-width: 667px) {
+      font-size: 60px;
+    }
   }
 
   .mg-modal-buttons {
@@ -216,12 +216,12 @@
         background: linear-gradient(#222, black);
       }
 
-      // Hoping that the use of flexbox means this isn't needed
-      // @media screen and (max-width: 667px) {
-      // margin: 15px auto;
-      // padding: 5px 10px;
-      // font-size: 15px;
-      // }
+      // For now, only reduce the font size on small screens
+      @media screen and (max-width: 667px) {
+        // margin: 15px auto;
+        // padding: 5px 10px;
+        font-size: 15px;
+      }
     }
   }
 }
