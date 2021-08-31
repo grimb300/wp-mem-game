@@ -120,7 +120,6 @@
 
 .mg-modal {
   width: 80%;
-  height: 80%;
   margin: 0 auto;
   background: white;
   padding: 5%;
@@ -130,6 +129,7 @@
   flex-flow: wrap;
   align-items: center;
   align-content: space-evenly;
+  gap: 20px;
 }
 .mg-modal .mg-winner {
   font-size: 80px;

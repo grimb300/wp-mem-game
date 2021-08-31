@@ -160,7 +160,8 @@
 .mg-modal {
   // display: none;
   width: 80%;
-  height: 80%;
+  // Need to allow the height to grow as big as it needs to
+  // height: 80%;
   margin: 0 auto;
   background: white;
   // Making the padding more responsive
@@ -174,6 +175,8 @@
   flex-flow: wrap;
   align-items: center;
   align-content: space-evenly;
+  // Need a gap here since the height above was removed
+  gap: 20px;
 
   .mg-winner {
     font-size: 80px;
