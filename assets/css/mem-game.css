@@ -20,15 +20,24 @@
   gap: 5px;
 }
 
-.mg-game,
-.mg-game.mg-layout-6x4 {
-  grid-template-columns: repeat(6, 1fr);
-}
+@media (orientation: landscape) {
+  .mg-game {
+    grid-template-columns: repeat(6, 1fr);
+  }
 
-.mg-game.mg-layout-4x6 {
-  grid-template-columns: repeat(4, 1fr);
+  .mg-card {
+    max-width: 18vh;
+  }
 }
+@media (orientation: portrait) {
+  .mg-game {
+    grid-template-columns: repeat(4, 1fr);
+  }
 
+  .mg-card {
+    max-width: 12vh;
+  }
+}
 .mg-game.mg-img-picker,
 .mg-game.mg-layout-6x4.mg-img-picker {
   grid-template-columns: repeat(6, 100px);
@@ -110,11 +119,17 @@
 }
 
 .mg-modal {
-  display: none;
   width: 80%;
+  height: 80%;
   margin: 0 auto;
   background: white;
-  padding: 30px 10px;
+  padding: 5%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex-flow: wrap;
+  align-items: center;
+  align-content: space-evenly;
 }
 .mg-modal .mg-winner {
   font-size: 80px;
@@ -122,9 +137,18 @@
   color: #4d4d4d;
   text-shadow: 0px 3px 0 black;
 }
-.mg-modal .mg-restart,
-.mg-modal .mg-leave {
-  margin: 30px auto;
+.mg-modal .mg-modal-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  flex-flow: wrap;
+  flex-flow: wrap;
+  align-items: center;
+  gap: 20px;
+}
+.mg-modal .mg-modal-buttons .mg-restart,
+.mg-modal .mg-modal-buttons .mg-leave {
+  margin: 5px;
   padding: 10px 20px;
   display: block;
   font-size: 25px;
@@ -135,8 +159,8 @@
   text-shadow: 0px 1px 0 black;
   cursor: pointer;
 }
-.mg-modal .mg-restart:hover,
-.mg-modal .mg-leave:hover {
+.mg-modal .mg-modal-buttons .mg-restart:hover,
+.mg-modal .mg-modal-buttons .mg-leave:hover {
   background: linear-gradient(#222, black);
 }
 

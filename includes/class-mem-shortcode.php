@@ -110,8 +110,10 @@ class MemShortcode {
         <div class=\"mg-modal-overlay\">
           <div class=\"mg-modal\">
             <h2 class=\"mg-winner\">$winner_msg</h2>
-            <button class=\"mg-restart\">$play_again_txt</button>
-            <a href=\"$quit_url\"><button class=\"mg-leave\">$quit_txt</button></a>
+            <div class=\"mg-modal-buttons\">
+              <button class=\"mg-restart\">$play_again_txt</button>
+              <a href=\"$quit_url\"><button class=\"mg-leave\">$quit_txt</button></a>
+            </div>
           </div>
         </div>
       </div>

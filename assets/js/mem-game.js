@@ -214,13 +214,14 @@
     },
 
     showModal: function () {
-      this.$overlay.show();
-      this.$modal.fadeIn("slow");
+      // this.$overlay.show();
+      // this.$modal.fadeIn("slow");
+      this.$overlay.fadeIn("slow");
     },
 
     hideModal: function () {
       this.$overlay.hide();
-      this.$modal.hide();
+      // this.$modal.hide();
     },
 
     reset: function () {
