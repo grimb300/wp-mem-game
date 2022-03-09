@@ -31,3 +31,4 @@ sass --watch assets/sass:assets/css
 | 0.3     | Enable multiple game definitions. Add game board layout configuration (6x4, 4x6, etc.).                                                                                       |
 | 0.3.1   | Fixes an animation display bug on iOS-Chrome and Safari.                                                                                                                      |
 | 0.3.2   | Automate the 6x4 vs 4x6 layout based on screen orientation. Scale card width based on screen size to fit entire game board on one screen. Make winner screen more responsive. |
+| 0.4     | Add high score features                                                                                                                                                       |
